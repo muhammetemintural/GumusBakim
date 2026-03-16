@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Malzeme Kullanımı Gir | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-info text-white pt-4 pb-3 px-4 rounded-top-4 d-flex align-items-center">
+                <i class="fa-solid fa-box-open fs-4 me-3"></i>
+                <div>
+                    <h5 class="mb-0 fw-bold">Sarf Malzeme Girişi</h5>
+                    <small class="text-white">Hasta: {{ ziyaret.hasta.ad }} {{ ziyaret.hasta.soyad }}</small>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 bg-white">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger py-2 small rounded-3"><i class="fa-solid fa-triangle-exclamation me-1"></i> {{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'hasta_detay' ziyaret.hasta.id %}" class="btn btn-light px-4 rounded-pill">Vazgeç</a>
+                        <button type="submit" class="btn btn-info text-white px-4 rounded-pill shadow-sm fw-bold">
+                            <i class="fa-solid fa-boxes-packing me-2"></i>Stoktan Düş
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Ziyaret Planla | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-success text-white pt-4 pb-3 px-4 rounded-top-4 d-flex align-items-center">
+                <i class="fa-solid fa-calendar-check fs-4 me-3"></i>
+                <div>
+                    <h5 class="mb-0 fw-bold">Yeni Ziyaret Planla</h5>
+                    <small class="text-white-50">Hasta: {{ hasta.ad }} {{ hasta.soyad }}</small>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 bg-white">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'hasta_detay' hasta.id %}" class="btn btn-light px-4 rounded-pill">Vazgeç</a>
+                        <button type="submit" class="btn btn-success px-4 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-save me-2"></i>Randevuyu Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

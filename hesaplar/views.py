@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from hastalar.models import Hasta
 
 # 1. Ana Karşılama Sayfası
 def ana_sayfa(request):
@@ -30,3 +31,15 @@ def personel_giris(request):
 # 3. İçerisi (Giriş yaptıktan sonra açılacak olan ana ekran)
 def dashboard(request):
     return render(request, 'dashboard.html')
+
+def dashboard(request):
+    # Güvenlik: Giriş yapmamış biri direkt URL'den girmeye çalışırsa logine at
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    # Veri tabanındaki tüm hastaları en son eklenene göre sıralayarak çek
+    tum_hastalar = Hasta.objects.all().order_by('-kayit_tarihi')
+    
+    # Çektiğimiz 'tum_hastalar' verisini HTML sayfasına gönderiyoruz
+    return render(request, 'dashboard.html', {'hastalar': tum_hastalar})
+

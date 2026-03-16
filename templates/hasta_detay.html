@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hasta.ad }} {{ hasta.soyad }} | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body text-center pt-5 pb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+                    <i class="fa-solid fa-user-injured"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-0">{{ hasta.ad }} {{ hasta.soyad }}</h4>
+                <p class="text-muted mb-3">T.C: {{ hasta.tc_kimlik_no }}</p>
+                
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="badge bg-danger bg-opacity-75 rounded-pill px-3 py-2">
+                        <i class="fa-solid fa-droplet me-1"></i> Kan: {{ hasta.kan_grubu|default:"Bilinmiyor" }}
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-75 rounded-pill px-3 py-2">
+                        <i class="fa-solid fa-calendar me-1"></i> Doğum: {{ hasta.dogum_tarihi|date:"Y" }}
+                    </span>
+                </div>
+                
+                <div class="text-start px-3">
+                    <p class="mb-2"><i class="fa-solid fa-phone text-muted me-2"></i> {{ hasta.telefon }}</p>
+                    <p class="mb-0"><i class="fa-solid fa-location-dot text-muted me-2"></i> {{ hasta.adres }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+                <div class="card border-0 bg-warning bg-opacity-10 shadow-sm rounded-4 h-100">
+                    <div class="card-body">
+                        <h6 class="text-warning fw-bold border-bottom border-warning pb-2 mb-3">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> Kronik Hastalıklar
+                        </h6>
+                        <p class="mb-0 text-dark">{{ hasta.kronik_hastaliklar|default:"Kayıtlı kronik hastalık bulunmuyor." }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card border-0 bg-danger bg-opacity-10 shadow-sm rounded-4 h-100">
+                    <div class="card-body">
+                        <h6 class="text-danger fw-bold border-bottom border-danger pb-2 mb-3">
+                            <i class="fa-solid fa-biohazard me-1"></i> Alerjiler
+                        </h6>
+                        <p class="mb-0 text-dark">{{ hasta.alerjiler|default:"Kayıtlı alerji bulunmuyor." }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-pills text-primary me-2"></i>Kullandığı İlaçlar ve Reçeteler</h5>
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-plus me-1"></i> İlaç Ekle
+                </button>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'ziyaret_ekle' hasta.id %}" class="btn btn-success rounded-pill shadow-sm px-4">
+                    <i class="fa-solid fa-calendar-plus me-2"></i> Evde Bakım Ziyareti Planla
+                </a>
+            </div>  
+            <div class="card-body px-4 pb-4 pt-2">
+                <div class="alert alert-light border border-dashed text-center py-4 mb-0">
+                    <i class="fa-solid fa-prescription-bottle-medical fs-2 text-muted mb-2 d-block"></i>
+                    <span class="text-muted">Bu hastaya henüz ilaç veya reçete tanımlanmamış.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow-sm border-0 rounded-4 mt-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-clock-rotate-left text-success me-2"></i>Ziyaret Geçmişi ve Planlar</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <th class="text-end pe-4">İşlem</th>
+                            <tr>
+                                <th class="ps-4">Tarih ve Saat</th>
+                                <th>Görevli Personel</th>
+                                <th>İşlem Detayı</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ziyaret in ziyaretler %}
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">{{ ziyaret.ziyaret_tarihi|date:"d M Y, H:i" }}</td>
+                                <td>
+                                    <i class="fa-solid fa-user-nurse text-muted me-1"></i> 
+                                    {{ ziyaret.personel.username|default:"Bilinmiyor" }}
+                                </td>
+                                <td>{{ ziyaret.yapilan_islemler|truncatechars:35 }}</td>
+                                <td>
+                                    {% if ziyaret.durum == 'planlandi' %}
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Planlandı</span>
+                                    {% elif ziyaret.durum == 'tamamlandi' %}
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">Tamamlandı</span>
+                                    {% else %}
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill">İptal Edildi</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'malzeme_kullan' ziyaret.id %}" class="btn btn-sm btn-outline-info rounded-pill px-3" title="Kullanılan Malzemeyi Gir">
+                                    <i class="fa-solid fa-syringe"></i> Sarf Gir
+                                </a>
+                            </td>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-calendar-xmark fs-3 text-light mb-2 d-block"></i>
+                                    Henüz planlanmış bir ziyaret bulunmuyor.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'auth_base.html' %}
+
+{% block title %}GümüşBakım | Personel Girişi{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg border-0 rounded-4" style="background-color: rgba(255, 255, 255, 0.95);">
+    <div class="card-body p-4 p-md-5 text-center">
+        
+        <div class="mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 80px; height: 80px;">
+                <i class="fa-solid fa-house-medical text-primary" style="font-size: 2.5rem;"></i>
+            </div>
+            <h2 class="auth-logo-text mb-0">GümüşBakım</h2>
+            <p class="text-muted small mt-1">Saha Personeli Operasyon Paneli</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger py-2 small rounded-3 text-start shadow-sm" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="">
+            {% csrf_token %}
+            
+            <div class="form-floating mb-3 text-start shadow-sm rounded-3">
+                <input type="text" class="form-control border-0" id="kullanici_adi" name="username" placeholder="Kullanıcı Adı" required autocomplete="off">
+                <label for="kullanici_adi" class="text-muted"><i class="fa-regular fa-user me-1"></i> Kullanıcı Adı / Sicil No</label>
+            </div>
+            
+            <div class="form-floating mb-4 text-start shadow-sm rounded-3">
+                <input type="password" class="form-control border-0" id="sifre" name="password" placeholder="Şifre" required>
+                <label for="sifre" class="text-muted"><i class="fa-solid fa-lock me-1"></i> Şifre</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow fw-bold py-3">
+                <i class="fa-solid fa-right-to-bracket me-2"></i> Sisteme Giriş Yap
+            </button>
+        </form>
+        
+        <div class="mt-4 text-muted" style="font-size: 0.75rem;">
+            <i class="fa-solid fa-shield-halved text-success me-1"></i> 256-bit Güvenli Bağlantı & Yetki İzolasyonu
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

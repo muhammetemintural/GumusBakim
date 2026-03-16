@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}GümüşBakım | Operasyon Paneli{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <div class="alert alert-success shadow-sm py-4 rounded-4">
+            <h2 class="fw-bold text-success mb-3">
+                <i class="fa-solid fa-circle-check me-2"></i>Sisteme Başarıyla Giriş Yaptınız!
+            </h2>
+            <p class="lead text-muted">
+                Sayın <strong>{{ request.user.username }}</strong>, GümüşBakım operasyon paneline hoş geldiniz. 
+                <br> Hasta listeleri ve ziyaret planlamaları yakında bu ekranda yer alacaktır.
+            </p>
+        </div>
+        
+        <a href="{% url 'home' %}" class="btn btn-outline-danger mt-3">
+            <i class="fa-solid fa-right-from-bracket me-1"></i> Şimdilik Çıkış Yap
+        </a>
+    </div>
+</div>
+{% endblock %}

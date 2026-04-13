@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Yeni Malzeme Tanımla | GümüşBakım ERP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-6">
+        <div class="gb-card p-0 overflow-hidden">
+            <div class="p-4 bg-primary text-white d-flex align-items-center">
+                <i class="fa-solid fa-box-open fs-3 me-3"></i>
+                <div>
+                    <h4 class="mb-0 fw-bold">Yeni Malzeme Tanımla</h4>
+                    <small class="opacity-75">Merkez depo envanterine yeni ürün ekleyin.</small>
+                </div>
+            </div>
+            
+            <div class="p-4 p-md-5 bg-white">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        {% for field in form %}
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small text-uppercase tracking-wider">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <hr class="my-5 opacity-50">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'stok_listesi' %}" class="btn btn-light px-4 rounded-pill fw-bold">
+                            <i class="fa-solid fa-chevron-left me-2"></i>Vazgeç
+                        </a>
+                        <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-lg fw-bold">
+                            Depoya Kaydet <i class="fa-solid fa-check ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

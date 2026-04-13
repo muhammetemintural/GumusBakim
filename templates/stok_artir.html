@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Stok Girişi | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-success text-white pt-4 pb-3 px-4 rounded-top-4 d-flex align-items-center">
+                <i class="fa-solid fa-boxes-packing fs-3 me-3"></i>
+                <div>
+                    <h5 class="mb-0 fw-bold">Depoya Mal Girişi (Stok Artır)</h5>
+                    <small class="text-white-50">{{ malzeme.ad }} (Mevcut: {{ malzeme.stok_miktari }} {{ malzeme.birim }})</small>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 bg-white">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase">{{ form.eklenecek_miktar.label }}</label>
+                        {{ form.eklenecek_miktar }}
+                    </div>
+                    
+                    <hr class="my-4 opacity-50">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'stok_listesi' %}" class="btn btn-light px-4 rounded-pill fw-bold">Vazgeç</a>
+                        <button type="submit" class="btn btn-success px-4 rounded-pill shadow-sm fw-bold">
+                            <i class="fa-solid fa-check me-2"></i>Stoğa Ekle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -49,11 +49,17 @@ def dashboard(request):
         tum_hastalar = Hasta.objects.all().order_by('-kayit_tarihi')
         bugun = timezone.now().date()
         
+        # Master Control İçin Ekstra Veriler:
+        son_ziyaretler = Ziyaret.objects.all().order_by('-ziyaret_tarihi')[:10] # Son 10 işlem
+        kritik_stok_listesi = Malzeme.objects.filter(stok_miktari__lt=10) # Sadece sayı değil, liste
+        
         context = {
             'hastalar': tum_hastalar,
+            'son_ziyaretler': son_ziyaretler,
             'toplam_hasta': tum_hastalar.count(),
             'bugunku_ziyaretler': Ziyaret.objects.filter(ziyaret_tarihi__date=bugun).count(),
-            'kritik_stok': Malzeme.objects.filter(stok_miktari__lt=10).count()
+            'kritik_stok_sayisi': kritik_stok_listesi.count(),
+            'kritik_stoklar': kritik_stok_listesi,
         }
         return render(request, 'dashboard_yonetici.html', context)
 
@@ -76,7 +82,5 @@ def dashboard(request):
         tum_hastalar = Hasta.objects.all().order_by('-kayit_tarihi')
         return render(request, 'dashboard_doktor.html', {'hastalar': tum_hastalar})
 
-    
-    
     # Eğer rol bunların hiçbiri değilse güvenliğe geri at
     return redirect('home')

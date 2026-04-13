@@ -1,49 +1,265 @@
 {% extends 'auth_base.html' %}
 
-{% block title %}GümüşBakım | Personel Girişi{% endblock %}
+{% block title %}Erişim Yetkilendirme | GümüşBakım ERP{% endblock %}
 
 {% block content %}
-<div class="card shadow-lg border-0 rounded-4" style="background-color: rgba(255, 255, 255, 0.95);">
-    <div class="card-body p-4 p-md-5 text-center">
+<style>
+    :root {
+        --gb-primary: #4318ff;
+        --gb-success: #05cd99;
+        --gb-dark-text: #1b2559;
+        --gb-text-muted: #a3aed1;
+        --gb-bg: #f4f7fe;
+    }
+
+    body {
+        background: #f4f7fe !important;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* PREMIUM CONTAINER */
+    .auth-wrapper {
+        display: flex;
+        width: 1050px;
+        max-width: 95%;
+        height: 650px;
+        background: #ffffff;
+        border-radius: 40px;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.15), 0 30px 60px -30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    /* SOL TARAF: MESH GRADIENT & BRANDING */
+    .brand-side {
+        flex: 1.1;
+        background-color: var(--gb-primary);
+        /* Modern Mesh Gradient: Sağlık ve Teknoloji Hissi */
+        background-image: 
+            radial-gradient(at 0% 0%, hsla(253,100%,65%,1) 0, transparent 50%), 
+            radial-gradient(at 50% 0%, hsla(225,100%,50%,1) 0, transparent 50%), 
+            radial-gradient(at 100% 0%, hsla(180,100%,45%,1) 0, transparent 50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px;
+        color: white;
+        position: relative;
+    }
+
+    /* SAĞ TARAF: FORM ALANI */
+    .form-side {
+        flex: 1;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #ffffff;
+    }
+
+    .brand-logo-wrap {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        width: 60px; height: 60px;
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .form-title { font-weight: 800; color: var(--gb-dark-text); font-size: 2.2rem; letter-spacing: -1.5px; }
+    .form-subtitle { color: #8f9bba; font-weight: 500; font-size: 1rem; margin-bottom: 40px; }
+
+    /* ULTRA MODERN INPUTLAR */
+    .field-group { margin-bottom: 25px; }
+    .field-group label {
+        display: block; font-size: 0.8rem; font-weight: 800; color: var(--gb-dark-text);
+        margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .field-control {
+        width: 100%;
+        background: #f4f7fe;
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 16px 24px;
+        font-weight: 600;
+        color: var(--gb-dark-text);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .field-control:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: var(--gb-primary);
+        box-shadow: 0 10px 20px rgba(67, 24, 255, 0.05);
+        transform: translateY(-2px);
+    }
+
+    /* 2. Giriş Butonu (Aşağıda ve Heybetli) */
+    .btn-login-premium {
+        background: var(--gb-primary);
+        color: white; border: none; border-radius: 20px;
+        padding: 18px; font-weight: 700; font-size: 1.1rem;
+        transition: all 0.3s;
+        box-shadow: 0 15px 30px rgba(67, 24, 255, 0.3);
+    }
+    .btn-login-premium:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px rgba(67, 24, 255, 0.4);
+        filter: brightness(1.1);
+    }
+
+    /* Sol Taraf: Özellik Listesi İçin Stil */
+    .features-list { list-style: none; padding: 0; margin-top: 40px; }
+    .features-list li {
+        display: flex; align-items: center;
+        margin-bottom: 20px; font-weight: 500; font-size: 1rem;
+        background: rgba(255,255,255,0.08);
+        padding: 12px 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .features-list i { margin-right: 15px; font-size: 1.2rem; opacity: 0.9; }
+
+    /* --- YENİ EKLENEN STİLLER --- */
+
+    /* SOL TARAF: DÖNEN YAZI KARTLARI (ANIMASYON) */
+    .premium-features-list {
+        position: relative;
+        height: 60px; /* Space for one item */
+        margin-top: 40px;
+        display: grid;
+        align-content: center;
+    }
+
+    .feature-tag {
+        grid-area: 1 / 1; /* Stack them on top of each other */
+        opacity: 0;
+        background: rgba(255,255,255,0.08);
+        padding: 12px 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: featureRotate 12s infinite; /* Total cycle time */
+    }
+
+    /* LIVE Pulse Dot (Canlı Durum) */
+    .feature-tag::before {
+        content: '';
+        width: 8px; height: 8px;
+        background-color: var(--gb-success); /* gb-success */
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 10px var(--gb-success);
+    }
+
+    /* Sequential delays (4s fade, 12s cycle) */
+    .feature-tag:nth-child(1) { animation-delay: 0s; }
+    .feature-tag:nth-child(2) { animation-delay: 4s; }
+    .feature-tag:nth-child(3) { animation-delay: 8s; }
+
+    @keyframes featureRotate {
+        0% { opacity: 0; transform: translateY(10px); }
+        5% { opacity: 1; transform: translateY(0); } /* Fade In */
+        30% { opacity: 1; transform: translateY(0); } /* Stay visible */
+        35% { opacity: 0; transform: translateY(-10px); } /* Fade Out */
+        100% { opacity: 0; }
+    }
+
+
+    /* SAĞ TARAF: OBVIOUS BACK HOME BUTTON (Farklı Renk) */
+    .btn-sys-outline-light {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 14px;
+        background-color: #f8fafc; /* gb-bg */
+        border: 2px solid #f1f4f9; /* gb-gray-200 */
+        border-radius: 16px;
+        color: #697a8d; /* gb-text-muted */
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+    }
+    .btn-sys-outline-light:hover {
+        border-color: #eaecef;
+        background-color: #f0f3f8;
+        color: var(--gb-primary);
+        transform: translateY(-2px);
+    }
+
+</style>
+
+<div class="auth-wrapper shadow">
+    <div class="brand-side d-none d-md-flex">
+        <div class="brand-logo-wrap"><i class="fa-solid fa-house-medical"></i></div>
+        <h1 class="fw-bolder" style="font-size: 2.5rem; letter-spacing: -2px;">GümüşBakım</h1>
+        <p class="fw-medium opacity-80 mt-2 mb-4">Geleceğin Sağlık Ekosistemi</p>
         
-        <div class="mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 80px; height: 80px;">
-                <i class="fa-solid fa-house-medical text-primary" style="font-size: 2.5rem;"></i>
+        <div class="premium-features-list">
+            <div class="feature-tag"><i class="fa-solid fa-microchip"></i> AI Destekli Klinik Analiz</div>
+            <div class="feature-tag"><i class="fa-solid fa-route"></i> Dinamik Saha Operasyonları</div>
+            <div class="feature-tag"><i class="fa-solid fa-boxes-stacked"></i> Akıllı Envanter Yönetimi</div>
+        </div>
+        
+        <div class="mt-auto">
+            <div class="d-flex align-items-center opacity-60 small">
+                <i class="fa-solid fa-shield-check me-2"></i> End-to-End Enterprise Encryption
             </div>
-            <h2 class="auth-logo-text mb-0">GümüşBakım</h2>
-            <p class="text-muted small mt-1">Saha Personeli Operasyon Paneli</p>
+        </div>
+    </div>
+
+    <div class="form-side">
+        <div>
+            <h1 class="form-title">Sisteme Giriş</h1>
+            <p class="form-subtitle">Kurumsal kimlik bilgilerinizle oturum açın.</p>
         </div>
 
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-danger py-2 small rounded-3 text-start shadow-sm" role="alert">
-                    <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ message }}
+                <div class="alert border-0 rounded-4 p-3 small fw-bold mb-4" style="background: #fff5f5; color: #ff4d4f;">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i> {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
 
-        <form method="POST" action="">
+        <form method="POST">
             {% csrf_token %}
             
-            <div class="form-floating mb-3 text-start shadow-sm rounded-3">
-                <input type="text" class="form-control border-0" id="kullanici_adi" name="username" placeholder="Kullanıcı Adı" required autocomplete="off">
-                <label for="kullanici_adi" class="text-muted"><i class="fa-regular fa-user me-1"></i> Kullanıcı Adı / Sicil No</label>
+            <div class="field-group">
+                <label>Personel Kimliği</label>
+                <input type="text" name="username" class="field-control" placeholder="Sicil No / Email" required autocomplete="off">
             </div>
-            
-            <div class="form-floating mb-4 text-start shadow-sm rounded-3">
-                <input type="password" class="form-control border-0" id="sifre" name="password" placeholder="Şifre" required>
-                <label for="sifre" class="text-muted"><i class="fa-solid fa-lock me-1"></i> Şifre</label>
+
+            <div class="field-group">
+                <label>Erişim Şifresi</label>
+                <input type="password" name="password" class="field-control" placeholder="••••••••" required>
             </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow fw-bold py-3">
-                <i class="fa-solid fa-right-to-bracket me-2"></i> Sisteme Giriş Yap
+
+            <button type="submit" class="btn-login-premium w-100">
+                Dashboard'a Eriş <i class="fa-solid fa-bolt ms-2 text-warning"></i>
             </button>
+
+            <a href="{% url 'home' %}" class="btn-sys-outline-light">
+                <i class="fa-solid fa-house-chimney me-2"></i> Ana Sayfaya Dön (Giriş Yapmadan)
+            </a>
         </form>
-        
-        <div class="mt-4 text-muted" style="font-size: 0.75rem;">
-            <i class="fa-solid fa-shield-halved text-success me-1"></i> 256-bit Güvenli Bağlantı & Yetki İzolasyonu
-        </div>
-        
+
+        <p class="text-center mt-auto small fw-bold" style="color: #cbd5e0;">
+            <i class="fa-solid fa-lock me-1"></i> 256-bit SSL Koruma
+        </p>
     </div>
 </div>
 {% endblock %}

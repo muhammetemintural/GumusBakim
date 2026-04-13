@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Ana Panel | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Merkez Komuta Paneli</h3>
+        <p class="mb-0" style="color: var(--gb-text-muted);">GümüşBakım operasyonlarının anlık durum özeti.</p>
+    </div>
+    <a href="{% url 'hasta_ekle' %}" class="btn-gb-primary shadow-sm">
+        <i class="fa-solid fa-plus me-2"></i>Yeni Hasta Kaydı
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="gb-card p-4 h-100 d-flex flex-column justify-content-center border-bottom border-primary border-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-muted text-uppercase tracking-wide">Kayıtlı Hasta</span>
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+            <h2 class="fw-bold mb-0 text-dark">{{ toplam_hasta }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="gb-card p-4 h-100 d-flex flex-column justify-content-center border-bottom border-success border-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-muted text-uppercase tracking-wide">Bugünkü Görevler</span>
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-car-side"></i>
+                </div>
+            </div>
+            <h2 class="fw-bold mb-0 text-dark">{{ bugunku_ziyaretler }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="gb-card p-4 h-100 d-flex flex-column justify-content-center border-bottom border-danger border-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-muted text-uppercase tracking-wide">Kritik Stok Uyarı</span>
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+            </div>
+            <h2 class="fw-bold mb-0 text-danger">{{ kritik_stok }} <span class="fs-6 fw-normal text-muted">Ürün</span></h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="gb-card p-4 h-100 d-flex flex-column justify-content-center border-bottom border-info border-4" style="background: linear-gradient(135deg, var(--gb-primary), #6b4cff); color: white;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-white text-uppercase tracking-wide">Yapay Zeka Durumu</span>
+                <i class="fa-solid fa-check-circle fs-4"></i>
+            </div>
+            <h4 class="fw-bold mb-0 text-white mt-1">Optimum</h4>
+            <p class="small text-white-50 mb-0">Çapraz kontroller aktif</p>
+        </div>
+    </div>
+</div>
+
+<div class="gb-card mb-5">
+    <div class="card-header bg-transparent border-bottom-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-list-ul me-2 text-primary"></i>Aktif Hasta Portföyü</h5>
+        <div class="input-group" style="width: 250px;">
+            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-search text-muted"></i></span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Hasta Ara...">
+        </div>
+    </div>
+    <div class="card-body p-0 pt-3">
+        <div class="table-responsive">
+            <table class="gb-table align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">T.C. Kimlik</th>
+                        <th>Ad Soyad</th>
+                        <th>Telefon</th>
+                        <th>Kan Grubu</th>
+                        <th class="text-end pe-4">Hızlı İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hasta in hastalar %}
+                    <tr>
+                        <td class="ps-4"><span class="gb-badge-light fw-bold">{{ hasta.tc_kimlik_no }}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 35px; height: 35px;">
+                                    {{ hasta.ad|make_list|first }}{{ hasta.soyad|make_list|first }}
+                                </div>
+                                <span class="fw-bold text-dark">{{ hasta.ad }} {{ hasta.soyad }}</span>
+                            </div>
+                        </td>
+                        <td class="text-muted"><i class="fa-solid fa-phone-flip me-2" style="font-size: 0.8rem;"></i>{{ hasta.telefon }}</td>
+                        <td><span class="gb-badge-danger py-1"><i class="fa-solid fa-droplet me-1"></i>{{ hasta.kan_grubu|default:"-" }}</span></td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'hasta_detay' hasta.id %}" class="btn-gb-outline btn-sm py-1 px-3">
+                                Dosyayı Aç <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fa-regular fa-folder-open fs-1 text-muted mb-3 d-block opacity-50"></i>
+                            <span class="text-muted fw-medium">Sistemde henüz kayıtlı hasta bulunmamaktadır.</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

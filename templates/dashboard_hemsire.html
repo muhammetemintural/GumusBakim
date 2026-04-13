@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Saha Görev Paneli | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Saha Görev Paneli</h3>
+        <p class="mb-0" style="color: var(--gb-text-muted);">Hoş geldin {{ request.user.username|title }}, bugünkü ev ziyaret rotan aşağıdadır.</p>
+    </div>
+    <div class="text-end">
+        <h5 class="fw-bold text-dark mb-0">{% now "d F Y, l" %}</h5>
+        <span class="gb-badge-info"><i class="fa-solid fa-clock me-1"></i>Mesai Devam Ediyor</span>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="gb-card p-4 h-100 d-flex align-items-center border-start border-warning border-4">
+            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-warning bg-opacity-10 text-warning" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                <i class="fa-solid fa-person-walking-luggage"></i>
+            </div>
+            <div>
+                <p class="small fw-bold text-muted text-uppercase mb-0">Bekleyen Ziyaret</p>
+                <h3 class="fw-bold mb-0 text-dark">{{ kalan_ziyaret_sayisi }} <span class="fs-6 fw-normal text-muted">Hasta</span></h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="gb-card p-4 h-100 d-flex align-items-center border-start border-success border-4">
+            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 bg-success bg-opacity-10 text-success" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+            <div>
+                <p class="small fw-bold text-muted text-uppercase mb-0">Tamamlanan</p>
+                <h3 class="fw-bold mb-0 text-dark">{{ tamamlanan_ziyaret_sayisi }} <span class="fs-6 fw-normal text-muted">Hasta</span></h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="gb-card mb-5">
+    <div class="card-header bg-transparent border-bottom-0 p-4 pb-0">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>Bugünkü Ziyaret Rotam</h5>
+    </div>
+    <div class="card-body p-0 pt-3">
+        <div class="table-responsive">
+            <table class="gb-table align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Saat</th>
+                        <th>Hasta Bilgisi</th>
+                        <th>Adres & İletişim</th>
+                        <th>Durum</th>
+                        <th class="text-end pe-4">Aksiyon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ziyaret in benim_ziyaretlerim %}
+                    <tr class="{% if ziyaret.durum == 'tamamlandi' %}opacity-50{% endif %}">
+                        <td class="ps-4">
+                            <span class="gb-badge-light fw-bold fs-6"><i class="fa-regular fa-clock me-1 text-primary"></i> {{ ziyaret.ziyaret_tarihi|date:"H:i" }}</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ ziyaret.hasta.ad }} {{ ziyaret.hasta.soyad }}</div>
+                            <div class="small text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ ziyaret.hasta.alerjiler|truncatechars:20|default:"Alerji Kaydı Yok" }}</div>
+                        </td>
+                        <td>
+                            <div class="small fw-medium text-dark"><i class="fa-solid fa-location-dot me-1 text-muted"></i>{{ ziyaret.hasta.adres|truncatechars:30 }}</div>
+                            <div class="small text-muted mt-1"><i class="fa-solid fa-phone me-1"></i>{{ ziyaret.hasta.telefon }}</div>
+                        </td>
+                        <td>
+                            {% if ziyaret.durum == 'planlandi' %}
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold">Planlandı</span>
+                            {% elif ziyaret.durum == 'tamamlandi' %}
+                                <span class="gb-badge-success"><i class="fa-solid fa-check"></i> Bitti</span>
+                            {% else %}
+                                <span class="gb-badge-danger">İptal</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if ziyaret.durum == 'planlandi' %}
+                            <div class="btn-group shadow-sm">
+                                <a href="{% url 'malzeme_kullan' ziyaret.id %}" class="btn btn-sm btn-light text-primary border fw-bold" title="Kullanılan Malzemeyi Gir">
+                                    <i class="fa-solid fa-syringe"></i> Sarf
+                                </a>
+                                <a href="{% url 'hasta_detay' ziyaret.hasta.id %}" class="btn btn-sm btn-primary fw-bold">
+                                    Dosyayı Aç <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                            {% else %}
+                            <a href="{% url 'hasta_detay' ziyaret.hasta.id %}" class="btn btn-sm btn-light text-muted border rounded-pill">
+                                <i class="fa-solid fa-folder-open me-1"></i> Arşiv
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fa-solid fa-mug-hot fs-1 text-muted mb-3 d-block opacity-50"></i>
+                            <span class="text-muted fw-medium">Bugün için planlanmış bir ev ziyaretiniz bulunmuyor.</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

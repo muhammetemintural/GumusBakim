@@ -1,42 +1,356 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GümüşBakım | Evde Sağlık Otomasyonu</title>
+{% extends 'auth_base.html' %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --gb-primary: #4318ff;
+        --gb-success: #05cd99;
+        --gb-danger: #ee5d50;
+        --gb-warning: #ffce20;
+        --gb-info: #39b8ff;
+        --gb-text-dark: #1b2559;
+        --gb-text-muted: #a3aed1;
+        --gb-bg: #f4f7fe;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        background-color: var(--gb-bg) !important;
+        overflow-x: hidden;
+    }
+
+    /* Gradient Metin Efekti */
+    .text-gradient {
+        background: linear-gradient(135deg, var(--gb-primary), #00d2ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 120px 0 80px 0;
+        background: radial-gradient(circle at top left, rgba(67, 24, 255, 0.08), transparent 40%),
+                    radial-gradient(circle at bottom right, rgba(5, 205, 153, 0.08), transparent 40%);
+    }
+
+    /* Havada Asılı Animasyonlar */
+    .floating-badge {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        padding: 12px 24px;
+        border-radius: 50px;
+        box-shadow: 0 20px 40px rgba(112, 144, 176, 0.2);
+        font-weight: 800;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 20;
+        animation: float 6s ease-in-out infinite;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .badge-1 { top: 10%; left: -8%; animation-delay: 0s; color: var(--gb-primary); }
+    .badge-2 { bottom: 15%; right: -5%; animation-delay: 2s; color: var(--gb-success); }
+    .badge-3 { top: 30%; right: 12%; animation-delay: 4s; color: var(--gb-danger); }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-25px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Ana Buton */
+    .btn-mega {
+        background: linear-gradient(135deg, var(--gb-primary), #6b4cff);
+        color: white;
+        padding: 18px 45px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(67, 24, 255, 0.3);
+        transition: all 0.3s ease;
+        border: none;
+    }
+    .btn-mega:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(67, 24, 255, 0.5);
+        color: white;
+    }
+
+    /* Koyu İstatistik Bandı */
+    .stats-band {
+        background: #111c44;
+        padding: 70px 0;
+        position: relative;
+        z-index: 30;
+    }
+    .stat-item h2 { color: white; font-weight: 800; font-size: 3rem; margin-bottom: 5px; }
+    .stat-item p { color: #a3aed1; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; }
+
+    /* YENİ: BENTO GRID (Apple Stili Asimetrik Kutular) */
+    .bento-section { padding: 120px 0; background-color: #ffffff; }
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
-<body class="bg-light">
+    .bento-card {
+        background: #f4f7fe;
+        border-radius: 30px;
+        padding: 40px;
+        height: 100%;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(112, 144, 176, 0.1);
+        overflow: hidden;
+        position: relative;
+    }
+    .bento-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px rgba(112, 144, 176, 0.15);
+        background: white;
+        border-color: rgba(67, 24, 255, 0.2);
+    }
+    
+    .bento-icon {
+        width: 60px; height: 60px;
+        border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem; margin-bottom: 25px;
+    }
 
-    <nav class="navbar navbar-dark bg-primary py-3 shadow-sm">
-        <div class="container d-flex justify-content-between">
-            <a class="navbar-brand fw-bold fs-4" href="#">
-                <i class="fa-solid fa-house-medical me-2"></i>GümüşBakım
-            </a>
-            <a href="{% url 'login' %}" class="btn btn-light btn-sm text-primary fw-bold rounded-pill px-3">
-                Personel Girişi
-            </a>
+    /* YENİ: Dev CTA Banner */
+    .cta-banner {
+        background: linear-gradient(135deg, #111c44, var(--gb-primary));
+        border-radius: 40px;
+        padding: 80px 40px;
+        margin: 100px 0;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(67, 24, 255, 0.2);
+    }
+    .cta-shape {
+        position: absolute; width: 300px; height: 300px;
+        background: rgba(255,255,255,0.1); border-radius: 50%; blur: 50px;
+    }
+
+    /* Mega Footer */
+    .mega-footer { background: #0b1437; padding: 80px 0 30px 0; color: #a3aed1; }
+    .mega-footer h5 { color: white; font-weight: 700; margin-bottom: 25px; }
+    .mega-footer ul { list-style: none; padding: 0; }
+    .mega-footer ul li { margin-bottom: 12px; }
+    .mega-footer ul li a { color: #a3aed1; text-decoration: none; transition: 0.3s; font-weight: 500; }
+    .mega-footer ul li a:hover { color: white; padding-left: 5px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar position-absolute w-100 top-0 pt-4" style="z-index: 100;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center w-100 bg-white p-3 px-4 rounded-pill shadow-sm" style="border: 1px solid rgba(67, 24, 255, 0.1);">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                    <i class="fa-solid fa-truck-medical"></i>
+                </div>
+                <h4 class="fw-bolder mb-0 text-dark" style="letter-spacing: -0.5px;">GümüşBakım <span class="badge bg-danger ms-2 fs-6 rounded-pill">v2.0</span></h4>
+            </div>
+            <a href="{% url 'login' %}" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">Sisteme Giriş <i class="fa-solid fa-arrow-right ms-2"></i></a>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container text-center mt-5 pt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <h1 class="display-5 fw-bold text-dark mb-4">
-                    Evde Sağlık Hizmetlerinde Yeni Nesil Otomasyon
+<div class="hero-section">
+    <div class="container content-wrapper">
+        <div class="row align-items-center">
+            
+            <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start position-relative z-3">
+                <span class="badge bg-white text-primary rounded-pill px-4 py-2 mb-4 fw-bold fs-6 shadow-sm border">
+                    <i class="fa-solid fa-microchip text-primary me-2"></i> Yeni Nesil Tıbbi Yapay Zeka
+                </span>
+                <h1 class="text-dark fw-bolder mb-4" style="font-size: 4.5rem; line-height: 1.1; letter-spacing: -2px;">
+                    Sağlıkta <br>
+                    <span class="text-gradient">Proaktif</span> Yönetim.
                 </h1>
-                <p class="lead text-muted mb-5">
-                    Hasta takibi, ziyaret planlaması ve ilaç yönetimi artık tek bir merkezden, tamamen dijital ve güvenli.
+                <p class="fs-5 mb-5 fw-medium" style="color: var(--gb-text-muted); max-width: 500px; margin: 0 auto 0 0; line-height: 1.7;">
+                    Saha personelinizi, klinik risklerinizi ve tıbbi envanterinizi saniyeler içinde analiz eden, hata payını sıfırlayan akıllı otomasyon.
                 </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{% url 'login' %}" class="btn-mega text-decoration-none">
+                        Panele Bağlan <i class="fa-solid fa-bolt ms-2 text-warning"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 position-relative text-center mt-5 mt-lg-0">
+                <div class="floating-badge badge-1"><i class="fa-solid fa-shield-virus fs-4 text-primary"></i> Çapraz İlaç Denetimi Aktif</div>
+                <div class="floating-badge badge-2"><i class="fa-solid fa-cubes fs-4 text-success"></i> Depo Otomasyonu</div>
+                <div class="floating-badge badge-3"><i class="fa-solid fa-route fs-4 text-danger"></i> Anlık Rota Optimizasyonu</div>
                 
-                <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold">
-                    <i class="fa-solid fa-right-to-bracket me-2"></i> Sisteme Giriş Yap
-                </a>
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/dashboard-ui-4440366-3733022.png" 
+                     alt="GümüşBakım" 
+                     class="img-fluid" 
+                     style="filter: drop-shadow(0px 40px 50px rgba(67, 24, 255, 0.25)); transform: scale(1.15);">
             </div>
         </div>
     </div>
+</div>
 
-</body>
-</html>
+<div class="stats-band">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6 stat-item border-end border-light border-opacity-10">
+                <h2>%99.8</h2>
+                <p>İlaç Uyum Tespiti</p>
+            </div>
+            <div class="col-md-3 col-6 stat-item border-end border-light border-opacity-10">
+                <h2>0.0s</h2>
+                <p>Alerji Uyarı Hızı</p>
+            </div>
+            <div class="col-md-3 col-6 stat-item border-end border-light border-opacity-10">
+                <h2>7/24</h2>
+                <p>Canlı Stok Senkronu</p>
+            </div>
+            <div class="col-md-3 col-6 stat-item">
+                <h2>SaaS</h2>
+                <p>Uçtan Uca Şifreleme</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bento-section">
+    <div class="container">
+        <div class="text-center mb-5 pb-3">
+            <h6 class="text-primary fw-bold text-uppercase tracking-wide mb-3">Modüllerimiz</h6>
+            <h2 class="fw-bolder text-dark" style="font-size: 3rem; letter-spacing: -1.5px;">Sistemin Kalbinde Ne Var?</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="bento-card" style="background: linear-gradient(135deg, #f8faff, #eef2ff);">
+                    <div class="row align-items-center h-100">
+                        <div class="col-md-7">
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-2 mb-3 fw-bold">Kritik Modül</span>
+                            <h3 class="fw-bolder text-dark mb-3">Akıllı Alerji & Çapraz Kontrol</h3>
+                            <p class="text-muted fw-medium fs-5 mb-0">Hastalara reçete edilen ilaçlar, sistemin tıbbi veri tabanından geçerek hastanın kronik hastalıkları ve alerjileri ile saliseler içinde kıyaslanır. Hata payı sıfıra iner.</p>
+                        </div>
+                        <div class="col-md-5 text-center mt-4 mt-md-0">
+                            <i class="fa-solid fa-biohazard text-danger" style="font-size: 8rem; opacity: 0.8; filter: drop-shadow(0 10px 20px rgba(238, 93, 80, 0.3));"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bento-card bg-white">
+                    <div class="bento-icon bg-success bg-opacity-10 text-success">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                    <h4 class="fw-bolder text-dark mb-3">Canlı Stok</h4>
+                    <p class="text-muted fw-medium">Sahada kullanılan her iğne ve serum, merkez deponuzdan anında düşer. Kritik seviyelerde anında uyarı alırsınız.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bento-card bg-white">
+                    <div class="bento-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <h4 class="fw-bolder text-dark mb-3">Saha Rota Yönetimi</h4>
+                    <p class="text-muted fw-medium">Hemşirelerin günlük ziyaret planları sistem üzerinden yönetilir, gecikmeler ve tamamlanan işler anlık izlenir.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="bento-card" style="background: linear-gradient(135deg, #fffcf5, #fff5d1);">
+                    <div class="row align-items-center h-100">
+                        <div class="col-md-5 text-center mb-4 mb-md-0">
+                            <i class="fa-solid fa-prescription-bottle-medical text-warning" style="font-size: 8rem; opacity: 0.9; filter: drop-shadow(0 10px 20px rgba(255, 206, 32, 0.4));"></i>
+                        </div>
+                        <div class="col-md-7">
+                            <h3 class="fw-bolder text-dark mb-3">Matematiksel İlaç Uyumu</h3>
+                            <p class="text-muted fw-medium fs-5 mb-0">Hastanın yalan söylemesine imkan yok. Hemşire kutudaki hapı sayar, sistem arka planda beklenen hap miktarını hesaplar ve hastanın ilacı unutup unutmadığını doktorun ekranına yansıtır.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="cta-banner text-center text-white">
+        <div class="cta-shape" style="top: -100px; left: -100px;"></div>
+        <div class="cta-shape" style="bottom: -150px; right: 10%;"></div>
+        
+        <h2 class="fw-bolder mb-4 position-relative z-3" style="font-size: 3.5rem; letter-spacing: -1.5px;">Geleceğin Sağlık Yönetimi Burada.</h2>
+        <p class="fs-5 mb-5 position-relative z-3 text-white-50" style="max-width: 600px; margin: 0 auto;">Kurumunuzun dijital dönüşümünü bugün başlatın. Jüri değerlendirmesi için sistemi hemen test edin.</p>
+        
+        <a href="{% url 'login' %}" class="btn btn-light rounded-pill px-5 py-3 fw-bold fs-5 text-primary shadow-lg position-relative z-3">
+            Hemen Başlayın <i class="fa-solid fa-rocket ms-2"></i>
+        </a>
+    </div>
+</div>
+
+<footer class="mega-footer">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fa-solid fa-truck-medical"></i>
+                    </div>
+                    <h4 class="fw-bolder text-white mb-0">GümüşBakım</h4>
+                </div>
+                <p class="fw-medium mb-4 pe-lg-5">Evde sağlık ve bakım hizmetleri için geliştirilmiş, yapay zeka ve çapraz algoritma destekli yeni nesil Kurumsal Kaynak Planlama (ERP) yazılımı.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-white fs-4"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="text-white fs-4"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-6">
+                <h5>Modüller</h5>
+                <ul>
+                    <li><a href="#">Klinik Panel</a></li>
+                    <li><a href="#">Saha Operasyonu</a></li>
+                    <li><a href="#">Akıllı İlaç Takibi</a></li>
+                    <li><a href="#">Depo ve Stok</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-6">
+                <h5>Proje</h5>
+                <ul>
+                    <li><a href="#">Mimari Yapı</a></li>
+                    <li><a href="#">Algoritmalar</a></li>
+                    <li><a href="#">Teknolojiler (Django)</a></li>
+                    <li><a href="#">Geliştirici</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4">
+                <h5>Sistem Durumu</h5>
+                <div class="bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25 mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-white">Veri Tabanı</span>
+                        <span class="badge bg-success rounded-pill">Aktif</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-white">Çapraz Kontrol Servisi</span>
+                        <span class="badge bg-success rounded-pill">Optimum</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-white">Sürüm</span>
+                        <span class="text-muted fw-bold">v2.0 Beta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-top border-secondary border-opacity-25 mt-5 pt-4 text-center">
+            <p class="mb-0 fw-medium">© 2026 GümüşBakım Yazılım Teknolojileri. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

@@ -6,7 +6,6 @@ class Profil(models.Model):
         ('doktor', 'Doktor'),
         ('hemşire', 'Hemşire'),
         ('yönetici', 'Yönetici'),
-        ('bakici', 'Hasta Bakıcı'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Kullanıcı")

@@ -1,7 +1,15 @@
 from django.contrib import admin
-from .models import Hasta
+from .models import Hasta, HastaIlaci # Kendi modellerini alıyor
 
 @admin.register(Hasta)
 class HastaAdmin(admin.ModelAdmin):
-    list_display = ('ad', 'soyad', 'tc_kimlik_no', 'telefon', 'kan_grubu') # Ana listede görünecek sütunlar
-    search_fields = ('ad', 'soyad', 'tc_kimlik_no') # Arama çubuğu ekler
+    list_display = ('ad', 'soyad', 'tc_kimlik_no', 'telefon', 'kan_grubu')
+    search_fields = ('ad', 'soyad', 'tc_kimlik_no')
+
+@admin.register(HastaIlaci)
+class HastaIlaciAdmin(admin.ModelAdmin):
+    list_display = ('ilac_adi', 'hasta', 'gunluk_kullanim_miktari', 'kutu_acilis_tarihi', 'beklenen_kalan_goster')
+    
+    def beklenen_kalan_goster(self, obj):
+        return f"{obj.beklenen_kalan} Adet"
+    beklenen_kalan_goster.short_description = "Sistemin Beklediği Kalan"

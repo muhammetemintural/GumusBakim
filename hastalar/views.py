@@ -27,11 +27,12 @@ def hasta_detay(request, id):
         
     secilen_hasta = get_object_or_404(Hasta, id=id)
     
-    # YENİ EKLENEN SATIR: Bu hastaya ait ziyaretleri tarihe göre (en yeni en üstte) çek
-    ziyaret_gecmisi = Ziyaret.objects.filter(hasta=secilen_hasta).order_by('-ziyaret_tarihi')
+    # Tüm verileri sekmeler için hazırla
+    ziyaretler = Ziyaret.objects.filter(hasta=secilen_hasta).order_by('-ziyaret_tarihi')
+    ilaclar = secilen_hasta.ilaclar.filter(aktif_mi=True) # Yeni eklediğimiz model
     
-    # 'ziyaretler' verisini de sayfaya gönderiyoruz
     return render(request, 'hasta_detay.html', {
         'hasta': secilen_hasta, 
-        'ziyaretler': ziyaret_gecmisi
+        'ziyaretler': ziyaretler,
+        'ilaclar': ilaclar
     })

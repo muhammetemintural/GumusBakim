@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}İnsan Kaynakları & Personel Merkezi | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="fa-solid fa-users-viewfinder text-primary me-2"></i>Personel & Ekip Yönetimi</h3>
+        <p class="mb-0" style="color: var(--gb-text-muted);">Sistemde aktif olarak görev yapan sağlık kadrosu.</p>
+    </div>
+    <div>
+        <a href="{% url 'personel_kayit' %}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-bold" style="background: var(--gb-primary); border: none;">
+            <i class="fa-solid fa-user-plus me-2"></i>Yeni Personel Ekle
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-2 border-primary">
+            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 me-3">
+                <i class="fa-solid fa-user-doctor fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-0">Klinik Kadrosu <span class="badge bg-light text-primary border ms-2">{{ doktorlar.count }}</span></h5>
+        </div>
+        
+        <div class="d-flex flex-column gap-3">
+            {% for doktor in doktorlar %}
+            <div class="gb-card p-3 border-start border-4 border-primary hover-shadow transition-all" style="transition: all 0.2s ease;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 fw-bold fs-5 shadow-sm" style="width: 50px; height: 50px;">
+                            {{ doktor.first_name|make_list|first|default:doktor.username|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bolder mb-0 text-dark">{{ doktor.get_full_name|default:doktor.username }}</h6>
+                            <small class="text-muted fw-medium"><i class="fa-solid fa-stethoscope me-1 text-primary opacity-75"></i> Uzman Doktor (ID: {{ doktor.username }})</small>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'personel_detay' doktor.id %}" class="btn btn-sm btn-light border fw-bold text-primary rounded-pill px-4 shadow-sm">
+                            Sicil ve Görevler <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center p-5 bg-white rounded-4 border border-dashed">
+                <i class="fa-solid fa-user-slash fs-1 text-muted opacity-50 mb-3"></i>
+                <h6 class="text-muted fw-bold">Kayıtlı Doktor Bulunamadı</h6>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-2 border-info">
+            <div class="bg-info bg-opacity-10 text-info p-2 rounded-3 me-3">
+                <i class="fa-solid fa-user-nurse fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-0">Saha Operasyon Ekibi <span class="badge bg-light text-info border ms-2">{{ hemsireler.count }}</span></h5>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+            {% for hemsire in hemsireler %}
+            <div class="gb-card p-3 border-start border-4 border-info hover-shadow transition-all" style="transition: all 0.2s ease;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center me-3 fw-bold fs-5 shadow-sm" style="width: 50px; height: 50px;">
+                            {{ hemsire.first_name|make_list|first|default:hemsire.username|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bolder mb-0 text-dark">{{ hemsire.get_full_name|default:hemsire.username }}</h6>
+                            <small class="text-muted fw-medium"><i class="fa-solid fa-kit-medical me-1 text-info opacity-75"></i> Saha Hemşiresi (ID: {{ hemsire.username }})</small>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'personel_detay' hemsire.id %}" class="btn btn-sm btn-light border fw-bold text-info rounded-pill px-4 shadow-sm">
+                            Sicil ve Görevler <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center p-5 bg-white rounded-4 border border-dashed">
+                <i class="fa-solid fa-user-slash fs-1 text-muted opacity-50 mb-3"></i>
+                <h6 class="text-muted fw-bold">Kayıtlı Hemşire Bulunamadı</h6>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

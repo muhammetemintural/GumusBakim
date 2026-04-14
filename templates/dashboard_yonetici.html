@@ -13,6 +13,7 @@
         </div>
     </div>
 
+
     <div class="col-md-3">
         <div class="gb-card p-4 border-start border-primary border-5">
             <small class="text-muted fw-bold text-uppercase">Toplam Portföy</small>
@@ -120,6 +121,30 @@
                 </div>
             </div>
             <div style="position: absolute; right: -5%; top: -50%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+        </div>
+    </div>
+<div class="col-12 mt-4 mb-5">
+        <div class="gb-card overflow-hidden" style="background: linear-gradient(135deg, #0f172a, #312e81); border: none;">
+            <div class="row g-0 align-items-center p-4 p-md-5">
+                <div class="col-md-8 d-flex align-items-center mb-4 mb-md-0">
+                    <div class="bg-white bg-opacity-10 p-4 rounded-circle me-4 text-white d-none d-sm-flex shadow" style="backdrop-filter: blur(5px);">
+                        <i class="fa-solid fa-users-viewfinder" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div>
+                        <span class="badge bg-white text-dark rounded-pill px-3 py-1 mb-2 fw-bold" style="letter-spacing: 1px;">İNSAN KAYNAKLARI</span>
+                        <h3 class="fw-bolder text-white mb-2" style="letter-spacing: -0.5px;">Personel & Ekip Yönetim Merkezi</h3>
+                        <p class="text-white-50 mb-0 fw-medium fs-6">
+                            Doktor ve Hemşire kadronuzun geçmiş operasyonlarını ve planlanan saha görevlerini detaylı analiz edin.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{% url 'personel_listesi' %}" class="btn bg-white text-dark fw-bolder rounded-pill px-5 py-3 shadow-lg" style="transition: transform 0.3s;">
+                        Personel Paneline Geç <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+            <div style="position: absolute; right: -5%; top: -50%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
         </div>
     </div>
 {% endblock %}

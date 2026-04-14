@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ personel.get_full_name }} Sicil Özeti | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="{% url 'personel_listesi' %}" class="text-decoration-none text-muted small fw-bold mb-3 d-inline-block">
+            <i class="fa-solid fa-arrow-left me-1"></i> Personel Listesine Dön
+        </a>
+        <div class="gb-card p-4 border-0 shadow-sm" style="background: linear-gradient(to right, #ffffff, #f8f9ff);">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-4 shadow-lg fw-bold fs-2" style="width: 80px; height: 80px;">
+                        {{ personel.first_name|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <h2 class="fw-800 text-dark mb-1">{{ personel.get_full_name|default:personel.username }}</h2>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold">
+                            <i class="fa-solid fa-id-badge me-1"></i> {{ personel.profil.get_rol_display }}
+                        </span>
+                        <span class="ms-2 text-muted fw-medium small">ID: {{ personel.username }}</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-4 border-start ps-md-4">
+                    <div class="text-center">
+                        <p class="small text-muted mb-0 fw-bold text-uppercase">Tamamlanan</p>
+                        <h3 class="fw-800 text-success mb-0">{{ gecmis_gorevler.count }}</h3>
+                    </div>
+                    <div class="text-center">
+                        <p class="small text-muted mb-0 fw-bold text-uppercase">Planlanan</p>
+                        <h3 class="fw-800 text-primary mb-0">{{ gelecek_gorevler.count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="d-flex align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-calendar-day me-2 text-primary"></i>Planlanmış Görevler</h5>
+        </div>
+        
+        <div class="d-flex flex-column gap-3">
+            {% for ziyaret in gelecek_gorevler %}
+            <div class="gb-card p-3 border-start border-4 border-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="fw-bold text-dark">{{ ziyaret.hasta.ad_soyad }}</div>
+                        <small class="text-muted d-block"><i class="fa-solid fa-clock me-1"></i> {{ ziyaret.ziyaret_tarihi|date:"d F Y - H:i" }}</small>
+                        <div class="mt-2">
+                            <span class="badge bg-light text-dark border rounded-pill">{{ ziyaret.get_islem_tipi_display }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'hasta_detay' ziyaret.hasta.id %}" class="btn btn-sm btn-outline-primary rounded-circle" title="Hasta Detayı">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-4 text-center bg-white rounded-4 border border-dashed">
+                <p class="text-muted mb-0 small fw-bold">Yakın zamanda planlanmış görev yok.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clock-rotate-left me-2 text-success"></i>Görev Sicili ve Geçmiş İşler</h5>
+        </div>
+
+        <div class="gb-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="gb-table align-middle m-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Tarih</th>
+                            <th>Hasta</th>
+                            <th>Yapılan İşlem</th>
+                            <th class="text-end pe-4">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ziyaret in gecmis_gorevler %}
+                        <tr>
+                            <td class="ps-4 small fw-bold text-muted">{{ ziyaret.ziyaret_tarihi|date:"d.m.Y" }}</td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ ziyaret.hasta.ad_soyad }}</div>
+                            </td>
+                            <td>
+                                <span class="small fw-medium">{{ ziyaret.get_islem_tipi_display }}</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Tamamlandı</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted small fw-bold">Henüz tamamlanmış bir görev kaydı bulunmuyor.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Yeni Personel Tanımlama | GümüşBakım ERP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-7">
+        <div class="gb-card p-0 overflow-hidden shadow-lg border-0">
+            <div class="p-4 bg-primary text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, var(--gb-primary), #6b4cff) !important;">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-20 p-3 rounded-circle me-3">
+                        <i class="fa-solid fa-user-plus fs-3"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-800">Personel Yetkilendirme</h4>
+                        <p class="mb-0 opacity-75 small fw-medium">Sisteme yeni bir Doktor veya Hemşire dahil edin.</p>
+                    </div>
+                </div>
+                <div class="text-end d-none d-sm-block">
+                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold">Erişim Seviyesi: Admin</span>
+                </div>
+            </div>
+            
+            <div class="p-4 p-md-5 bg-white">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h6 class="text-primary fw-800 text-uppercase small tracking-wider mb-3">
+                                <i class="fa-solid fa-id-card me-2"></i>Sistem Giriş Bilgileri
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.username.label }}</label>
+                            {{ form.username }}
+                            <small class="text-muted" style="font-size: 0.7rem;">Personelin giriş yaparken kullanacağı sicil no veya kullanıcı adı.</small>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.password.label }}</label>
+                            {{ form.password }}
+                            <small class="text-muted" style="font-size: 0.7rem;">İlk giriş için geçici bir şifre belirleyin.</small>
+                        </div>
+
+                        <div class="col-12 mt-5">
+                            <h6 class="text-primary fw-800 text-uppercase small tracking-wider mb-3">
+                                <i class="fa-solid fa-user-tie me-2"></i>Kişisel ve Mesleki Detaylar
+                            </h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.rol.label }}</label>
+                            {{ form.rol }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">{{ form.telefon.label }}</label>
+                            {{ form.telefon }}
+                        </div>
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger mt-4 rounded-4 border-0 shadow-sm">
+                        <ul class="mb-0 small fw-bold">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <hr class="my-5 opacity-50">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'dashboard' %}" class="btn btn-light px-4 rounded-pill fw-bold text-muted text-decoration-none">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Vazgeç
+                        </a>
+                        <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-lg fw-800 py-3" style="background: var(--gb-primary); border: none;">
+                            Kaydı Tamamla & Yetkilendir <i class="fa-solid fa-shield-check ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -35,6 +35,7 @@ urlpatterns = [
     # core/urls.py içine hesaplar_views rotalarının olduğu yere ekle:
     path('personel-yonetimi/', hesaplar_views.personel_listesi, name='personel_listesi'),
     path('personel-yonetimi/<int:id>/', hesaplar_views.personel_detay, name='personel_detay'),
-    
+    path('klinik-merkezi/', hastalar_views.hasta_listesi, name='hasta_listesi'),
+    path('atama-merkezi/', ziyaretler_views.atama_merkezi, name='atama_merkezi'),
     
 ]

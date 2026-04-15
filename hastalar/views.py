@@ -36,3 +36,16 @@ def hasta_detay(request, id):
         'ziyaretler': ziyaretler,
         'ilaclar': ilaclar
     })
+
+def hasta_listesi(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+    # Hastaları en son eklenenden en eskiye doğru sıralıyoruz
+    tum_hastalar = Hasta.objects.all().order_by('-kayit_tarihi')
+    
+    context = {
+        'hastalar': tum_hastalar,
+        'toplam_hasta': tum_hastalar.count(),
+    }
+    return render(request, 'hasta_listesi.html', context)

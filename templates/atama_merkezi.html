@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Operasyon ve Atama Merkezi | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="fa-solid fa-network-wired text-primary me-2"></i>Operasyon ve Atama Merkezi</h3>
+        <p class="mb-0 text-muted">Saha operasyonlarını planlayın ve görev dağılımını yönetin.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-users-viewfinder text-info me-2"></i>Personel Durumu (Bugün)</h5>
+        <p class="small text-muted mb-3">Aşağıdaki personellerden birini seçerek sağdaki forma otomatik aktarabilirsiniz.</p>
+        
+        <div class="d-flex flex-column gap-3" style="max-height: 600px; overflow-y: auto;">
+            {% for personel in personeller %}
+            <div class="gb-card p-3 border-start border-4 {% if personel.bugunku_gorev_sayisi > 3 %}border-danger{% elif personel.bugunku_gorev_sayisi > 0 %}border-warning{% else %}border-success{% endif %} hover-shadow cursor-pointer personel-kart" 
+                 data-personel-id="{{ personel.id }}" 
+                 style="transition: all 0.2s ease; cursor: pointer;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center me-3 fw-bold fs-5 shadow-sm" style="width: 45px; height: 45px;">
+                            {{ personel.first_name|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bolder mb-0 text-dark">{{ personel.get_full_name|default:personel.username }}</h6>
+                            <small class="text-muted">{{ personel.profil.get_rol_display }}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge {% if personel.bugunku_gorev_sayisi > 3 %}bg-danger{% elif personel.bugunku_gorev_sayisi > 0 %}bg-warning text-dark{% else %}bg-success{% endif %} rounded-pill px-3 py-2">
+                            {{ personel.bugunku_gorev_sayisi }} Görev
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="gb-card p-4 p-md-5 border-0 shadow-lg" style="background: linear-gradient(to bottom right, #ffffff, #f8f9ff);">
+            <h5 class="fw-bold mb-4 border-bottom pb-3"><i class="fa-solid fa-calendar-check text-primary me-2"></i>Yeni Görev Emri Oluştur</h5>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-muted">Hedef Hasta</label>
+                        {{ form.hasta }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-muted">Görevlendirilecek Personel</label>
+                        {{ form.personel }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-muted">Ziyaret Tarihi ve Saati</label>
+                        {{ form.ziyaret_tarihi }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-muted">İşlem Tipi</label>
+                        {{ form.islem_tipi }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small text-muted">Görev Notları (Opsiyonel)</label>
+                        {{ form.notlar }}
+                    </div>
+                </div>
+                
+                <hr class="my-4 opacity-25">
+                
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-lg fw-bold py-2">
+                        Görevi Onayla ve Ata <i class="fa-solid fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sol taraftaki kartlara tıklanınca formdaki personeli otomatik seçen basit ve etkili bir JS kodu
+    document.addEventListener("DOMContentLoaded", function() {
+        const personelKartlari = document.querySelectorAll('.personel-kart');
+        const personelSelectBox = document.getElementById('id_personel'); // Django'nun forma atadığı ID
+
+        personelKartlari.forEach(kart => {
+            kart.addEventListener('click', function() {
+                const personelId = this.getAttribute('data-personel-id');
+                personelSelectBox.value = personelId;
+                
+                // Tıklanan karta görsel bir vurgu (Mavi çerçeve) ekleyelim
+                personelKartlari.forEach(k => k.classList.remove('border-primary', 'bg-light'));
+                this.classList.add('border-primary', 'bg-light');
+            });
+        });
+    });
+</script>
+{% endblock %}

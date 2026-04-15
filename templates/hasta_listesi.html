@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Klinik Merkezi | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="fa-solid fa-hospital-user text-success me-2"></i>Klinik ve Hasta Yönetimi</h3>
+        <p class="mb-0" style="color: var(--gb-text-muted);">Sistemde kayıtlı toplam <strong class="text-dark">{{ toplam_hasta }}</strong> aktif hasta dosyası bulunuyor.</p>
+    </div>
+    <div>
+        <a href="{% url 'hasta_ekle' %}" class="btn btn-success px-4 py-2 rounded-pill shadow-sm fw-bold">
+            <i class="fa-solid fa-user-plus me-2"></i>Yeni Hasta Kaydı
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for hasta in hastalar %}
+    <div class="col-md-6 col-lg-4">
+        <div class="gb-card h-100 border-top border-4 border-success hover-shadow transition-all" style="transition: all 0.3s ease;">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center me-3 fw-bold fs-4" style="width: 55px; height: 55px;">
+                            {{ hasta.ad_soyad|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">{{ hasta.ad_soyad }}</h5>
+                            <small class="text-muted"><i class="fa-solid fa-id-card me-1"></i> TC: {{ hasta.tc_kimlik|default:"Belirtilmemiş" }}</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light rounded-3 p-3 mb-4">
+                    <div class="row g-2 text-center">
+                        <div class="col-6 border-end">
+                            <small class="text-muted d-block fw-bold mb-1">Yaş</small>
+                            <span class="fw-bolder text-dark">{{ hasta.yas|default:"-" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block fw-bold mb-1">Telefon</small>
+                            <span class="fw-bolder text-dark">{{ hasta.telefon|default:"-" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'hasta_detay' hasta.id %}" class="btn btn-outline-success fw-bold rounded-pill">
+                        <i class="fa-solid fa-folder-open me-2"></i>Hasta Dosyasını Aç
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 px-4 pb-3 pt-0">
+                <small class="text-muted fw-medium"><i class="fa-solid fa-calendar-plus me-1"></i> Kayıt: {{ hasta.kayit_tarihi|date:"d.m.Y" }}</small>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center p-5 bg-white rounded-4 border border-dashed shadow-sm">
+            <i class="fa-solid fa-bed-pulse fs-1 text-muted opacity-50 mb-3"></i>
+            <h5 class="text-muted fw-bold">Sistemde henüz kayıtlı hasta bulunmuyor.</h5>
+            <p class="text-muted small">Sağ üstteki butonu kullanarak yeni bir hasta dosyası oluşturabilirsiniz.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

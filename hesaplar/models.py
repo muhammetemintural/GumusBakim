@@ -17,3 +17,18 @@ class Profil(models.Model):
     class Meta:
         verbose_name = "Profil"
         verbose_name_plural = "Profiller"
+class Mesaj(models.Model):
+    gonderen = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gonderilen_mesajlar')
+    alici = models.ForeignKey(User, on_delete=models.CASCADE, related_name='alinan_mesajlar')
+    icerik = models.TextField(verbose_name="Mesaj İçeriği")
+    tarih = models.DateTimeField(auto_now_add=True)
+    okundu_mu = models.BooleanField(default=False)
+    acil_mi = models.BooleanField(default=False, verbose_name="Acil Durum Mesajı mı?")
+
+    class Meta:
+        verbose_name = "Mesaj"
+        verbose_name_plural = "Mesajlar"
+        ordering = ['-tarih']
+
+    def __str__(self):
+        return f"{self.gonderen} -> {self.alici}: {self.icerik[:20]}"

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-2pz5o%8lu!nn&)d@v=rybe-&4(f*3s9gc-r-cwh9p-#_4v2y_w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,10 +41,13 @@ INSTALLED_APPS = [
     'hastalar',
     'stok_takip',
     'ziyaretler',
+    'rest_framework',
+    'corsheaders'
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -125,3 +128,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+CORS_ALLOW_ALL_ORIGINS = True

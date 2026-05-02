@@ -4,55 +4,53 @@
 
 {% block content %}
 <div class="row mt-2">
+    <!-- Sol Taraf: Hasta Profil Kartı -->
     <div class="col-lg-4 mb-4">
         <div class="gb-card sticky-top" style="top: 110px;">
             <div class="card-body text-center pt-5 pb-4">
                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: rgba(67, 24, 255, 0.1); color: var(--gb-primary); font-size: 2.5rem;">
                     <i class="fa-solid fa-user-injured"></i>
                 </div>
-                <h4 class="fw-bold mb-2">{{ hasta.ad }} {{ hasta.soyad }}</h4>
+                <h4 class="fw-bold mb-2">{{ hasta.ad|title }} {{ hasta.soyad|title }}</h4>
                 <p class="gb-badge-light d-inline-block mb-4">T.C: {{ hasta.tc_kimlik_no }}</p>
                 
                 <div class="d-flex justify-content-center gap-2 mb-4">
-                    <span class="gb-badge-danger"><i class="fa-solid fa-droplet me-1"></i> {{ hasta.kan_grubu|default:"??" }}</span>
-                    <span class="gb-badge-info"><i class="fa-solid fa-calendar me-1"></i> {{ hasta.dogum_tarihi|date:"Y" }}</span>
+                    <span class="gb-badge-danger"><i class="fa-solid fa-droplet me-1"></i> {{ hasta.kan_grubu|default:"Bilinmiyor" }}</span>
+                    <span class="gb-badge-info"><i class="fa-solid fa-calendar me-1"></i> D.Yılı: {{ hasta.dogum_tarihi|date:"Y"|default:"-" }}</span>
                 </div>
                 
                 <hr style="border-color: #e9edf7;">
                 <div class="text-start px-3 mt-4" style="color: var(--gb-text-muted); font-weight: 500;">
-                    <p class="mb-3"><i class="fa-solid fa-phone me-3" style="color: var(--gb-primary);"></i> {{ hasta.telefon }}</p>
-                    <p class="mb-0"><i class="fa-solid fa-location-dot me-3" style="color: var(--gb-primary);"></i> {{ hasta.adres }}</p>
+                    <p class="mb-3"><i class="fa-solid fa-phone me-3" style="color: var(--gb-primary);"></i> {{ hasta.telefon|default:"Telefon Yok" }}</p>
+                    <p class="mb-0"><i class="fa-solid fa-location-dot me-3" style="color: var(--gb-primary);"></i> {{ hasta.adres|default:"Adres Kaydı Yok" }}</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Sağ Taraf: Sekmeler -->
     <div class="col-lg-8">
         <ul class="nav nav-pills gb-tabs nav-justified mb-4 shadow-sm" id="hastaTab" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ilac" type="button">
-                    <i class="fa-solid fa-pills me-2"></i>İlaç Takibi
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ozet" type="button">
-                    <i class="fa-solid fa-heartbeat me-2"></i>Risk Paneli
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ziyaret" type="button">
-                    <i class="fa-solid fa-clipboard-list me-2"></i>Ziyaretler
-                </button>
-            </li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ilac" type="button"><i class="fa-solid fa-pills me-2"></i>İlaç Takibi</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#ozet" type="button"><i class="fa-solid fa-heartbeat me-2"></i>Risk Paneli</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#ziyaret" type="button"><i class="fa-solid fa-clipboard-list me-2"></i>Ziyaretler</button></li>
+            <!-- 4. SEKME BUTONU -->
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#loglar" type="button"><i class="fa-solid fa-server me-2"></i>Sistem Logları</button></li>
         </ul>
 
+        <!-- BÜTÜN SEKME İÇERİKLERİNİN ANA KUTUSU -->
         <div class="tab-content">
             
+            <!-- 1. Sekme: İlaç Takibi -->
             <div class="tab-pane fade show active" id="ilac" role="tabpanel">
                 <div class="gb-card p-2">
                     <div class="d-flex justify-content-between align-items-center p-3">
                         <h5 class="fw-bold mb-0">Aktif İlaç Envanteri</h5>
-                        <button class="btn-gb-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Yeni İlaç</button>
+                        {% if request.user.profil.rol == 'yönetici' or request.user.profil.rol == 'doktor' %}
+                        <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#yeniIlacModal">
+                            <i class="fa-solid fa-plus me-1"></i> Yeni İlaç
+                        </button>
+                        {% endif %}
                     </div>
                     <div class="table-responsive">
                         <table class="gb-table">
@@ -60,22 +58,53 @@
                                 <tr>
                                     <th class="ps-4">İlaç Adı</th>
                                     <th>Doz</th>
-                                    <th>Sistemin Beklediği</th>
-                                    <th class="text-end pe-4">Sayıma Git</th>
+                                    <th>ADET</th>
+                                    <th class="text-end pe-4">Aksiyon</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for ilac in ilaclar %}
                                 <tr>
-                                    <td class="ps-4" style="color: var(--gb-primary);">{{ ilac.ilac_adi }}</td>
-                                    <td><span class="gb-badge-light">Günde {{ ilac.gunluk_kullanim_miktari }}</span></td>
-                                    <td><span class="gb-badge-info">{{ ilac.beklenen_kalan }} Tablet</span></td>
+                                    <td class="ps-4 fw-bold" style="color: var(--gb-primary);">{{ ilac.ilac_adi }}</td>
+                                    <td><span class="gb-badge-light">{{ ilac.doz|default:"-" }}</span></td>
+                                    <td><span class="gb-badge-info">{{ ilac.beklenen_kalan }} Adet</span></td>
                                     <td class="text-end pe-4">
-                                        <a href="#" class="btn-gb-outline py-1 px-3 fs-6"><i class="fa-solid fa-check"></i> Kontrol</a>
+                                        {% if request.user.profil.rol == 'hemşire' or request.user.profil.rol == 'yönetici' %}
+                                        <button class="btn btn-sm btn-outline-success py-1 px-2" data-bs-toggle="modal" data-bs-target="#sayimModal{{ ilac.id }}">
+                                            <i class="fa-solid fa-barcode me-1"></i>Sayım Yap
+                                        </button>
+                                        
+                                        <!-- Sayım Modalı -->
+                                        <div class="modal fade" id="sayimModal{{ ilac.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                                <div class="modal-content border-0 shadow-lg text-start">
+                                                    <div class="modal-header bg-success bg-opacity-10">
+                                                        <h6 class="modal-title fw-bold text-success">İlaç Kontrolü</h6>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form action="{% url 'ilac_sayim_kontrol' ilac.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body p-4 text-center">
+                                                            <div class="mb-3">
+                                                                <small class="text-muted d-block mb-2">{{ ilac.ilac_adi }} için eldeki miktar:</small>
+                                                                <input type="number" name="fiili_stok" class="form-control form-control-lg text-center fw-bold" placeholder="0" required>
+                                                            </div>
+                                                            <div class="mb-3">Sistem Kaydı: <strong>{{ ilac.beklenen_kalan }} Adet</strong></div>
+                                                        </div>
+                                                        <div class="modal-footer border-0 p-3 pt-0">
+                                                            <button type="submit" class="btn btn-success w-100 fw-bold">Kontrolü Tamamla</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted small">Sayım Yetkisi Yok</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="4" class="text-center py-4" style="color: var(--gb-text-muted);">İlaç kaydı yok.</td></tr>
+                                <tr><td colspan="4" class="text-center py-4 text-muted">İlaç kaydı yok.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -83,6 +112,7 @@
                 </div>
             </div>
 
+            <!-- 2. Sekme: Risk Paneli -->
             <div class="tab-pane fade" id="ozet" role="tabpanel">
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -100,11 +130,11 @@
                 </div>
             </div>
 
+            <!-- 3. Sekme: Ziyaretler -->
             <div class="tab-pane fade" id="ziyaret" role="tabpanel">
-                <div class="gb-card p-2">
+                <div class="gb-card p-2 mb-4">
                     <div class="d-flex justify-content-between align-items-center p-3">
                         <h5 class="fw-bold mb-0">Ziyaret Geçmişi</h5>
-                        <a href="{% url 'ziyaret_ekle' hasta.id %}" class="btn-gb-primary btn-sm"><i class="fa-solid fa-calendar-plus me-1"></i> Yeni Ziyaret</a>
                     </div>
                     <div class="table-responsive">
                         <table class="gb-table">
@@ -120,12 +150,160 @@
                                 {% for ziyaret in ziyaretler %}
                                 <tr>
                                     <td class="ps-4"><span class="gb-badge-light">{{ ziyaret.ziyaret_tarihi|date:"d M Y" }}</span></td>
-                                    <td><i class="fa-solid fa-user-nurse me-2" style="color: var(--gb-text-muted);"></i>{{ ziyaret.personel.username }}</td>
-                                    <td><span class="gb-badge-success">{{ ziyaret.get_durum_display }}</span></td>
+                                    <td><i class="fa-solid fa-user-nurse me-2 text-muted"></i>{{ ziyaret.personel.username|title }}</td>
+                                    <td><span class="badge {% if ziyaret.durum == 'tamamlandi' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill">{{ ziyaret.get_durum_display }}</span></td>
                                     <td class="text-end pe-4">
-                                        <a href="{% url 'malzeme_kullan' ziyaret.id %}" class="btn-gb-outline py-1 px-3 fs-6"><i class="fa-solid fa-box-open"></i> Sarf Gir</a>
+                                        {% if request.user.profil.rol == 'hemşire' or request.user.profil.rol == 'yönetici' %}
+                                        <a href="{% url 'malzeme_kullan' ziyaret.id %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-box-open me-1"></i> Sarf Gir</a>
+                                        {% else %}
+                                        <i class="fa-solid fa-lock text-muted" title="Sadece Hemşire ve Yönetici sarf düşebilir"></i>
+                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Kayıt bulunmuyor.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PROFESYONEL HEMŞİRE İŞLEM KAYIT FORMU -->
+                <div class="card shadow border-0 mt-4 mb-5" style="border-radius: 16px; overflow: hidden;">
+                    <div class="card-header bg-success text-white d-flex align-items-center justify-content-between p-3">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-stethoscope me-2 fs-4 align-middle"></i> Ziyaret / Klinik İşlem Kaydı</h5>
+                        <span class="badge bg-white text-success rounded-pill px-3 py-2"><i class="fa-solid fa-clock me-1"></i> {% now "d M Y - H:i" %}</span>
+                    </div>
+                    <div class="card-body p-4 bg-light">
+                        <form action="{% url 'ziyaret_ekle' hasta.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Görevli Personel</label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0 text-primary"><i class="fas fa-user-nurse"></i></span>
+                                        <input type="text" name="hemsire_adi" class="form-control border-start-0 fw-bold" required value="{{ request.user.first_name|default:request.user.username|title }}">
+                                    </div>
+                                    <div class="form-text" style="font-size: 0.75rem;">Sisteme giriş yapan kullanıcı otomatik atandı.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Tansiyon (SKB/DKB)</label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0 text-danger"><i class="fas fa-heartbeat"></i></span>
+                                        <input type="text" name="tansiyon" class="form-control border-start-0 border-end-0 fw-bold text-center" placeholder="Örn: 120/80">
+                                        <span class="input-group-text bg-white text-muted small">mmHg</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Kan Şekeri</label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0 text-info"><i class="fas fa-tint"></i></span>
+                                        <input type="text" name="seker" class="form-control border-start-0 border-end-0 fw-bold text-center" placeholder="Örn: 110">
+                                        <span class="input-group-text bg-white text-muted small">mg/dL</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase mb-0">Klinik Notlar ve Yapılan İşlemler</label>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="hizliNotEkle('İlaçları eksiksiz verildi ve kullanımları kontrol edildi. ')"><i class="fas fa-pills"></i> İlaç Verildi</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="hizliNotEkle('Pansumanı değiştirildi ve yara bakımı yapıldı. ')"><i class="fas fa-band-aid"></i> Pansuman</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="hizliNotEkle('Hastanın genel durumu stabil, şikayeti yok. ')"><i class="fas fa-check"></i> Stabil</button>
+                                    </div>
+                                </div>
+                                <textarea id="klinikNot" name="notlar" class="form-control shadow-sm border-0" rows="4" required placeholder="Hastanın güncel durumunu, şikayetlerini veya yapılan ekstra işlemleri buraya detaylıca yazabilirsiniz..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100 shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px;">
+                                <i class="fas fa-cloud-upload-alt me-2"></i> Ziyareti Tamamla ve Mobil Sisteme Aktar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SEKME (SİSTEM LOGLARI) ARTIK DOĞRU KUTUNUN İÇİNDE! -->
+            <div class="tab-pane fade" id="loglar" role="tabpanel">
+                <div class="gb-card p-2 mb-4" style="border-left: 5px solid #2c3e50;">
+                    <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>Güvenlik ve İşlem Logları</h5>
+                        <span class="badge bg-secondary">Sistem Denetim Merkezi</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="gb-table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Tarih / Saat</th>
+                                    <th>Kullanıcı (Hesap)</th>
+                                    <th>İşlem Özeti</th>
+                                    {% if request.user.profil.rol == 'yönetici' or request.user.profil.rol == 'doktor' %}
+                                    <th class="text-end pe-4 text-danger"><i class="fa-solid fa-lock me-1"></i> Gizli Detaylar</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in loglar %}
+                                <tr>
+                                    <td class="ps-4 text-muted small"><i class="fa-regular fa-clock me-1"></i>{{ log.tarih|date:"d.m.Y - H:i" }}</td>
+                                    <td><span class="badge bg-dark">{{ log.kullanici.username|title }}</span></td>
+                                    <td class="fw-medium">{{ log.islem_ozeti }}</td>
+
+                                    {% if request.user.profil.rol == 'yönetici' or request.user.profil.rol == 'doktor' %}
+                                    <td class="text-end pe-4">
+                                        <!-- Yeni Profesyonel Buton (Alert yerine Modalı tetikler) -->
+                                        <button class="btn btn-sm btn-outline-danger fw-bold" data-bs-toggle="modal" data-bs-target="#logModal{{ log.id }}">
+                                            <i class="fa-solid fa-magnifying-glass me-1"></i> İncele
+                                        </button>
+
+                                        <!-- PROFESYONEL LOG İNCELEME EKRANI (Her log için özel oluşturulur) -->
+                                        <div class="modal fade" id="logModal{{ log.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content border-0 shadow-lg text-start rounded-4">
+                                                    
+                                                    <!-- Modal Başlığı -->
+                                                    <div class="modal-header bg-danger text-white border-bottom-0 rounded-top-4 p-4">
+                                                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-secret me-2"></i>Sistem Denetim Logu</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+
+                                                    <div class="modal-body p-4 bg-light">
+                                                        <!-- Üst Bilgi Kartları -->
+                                                        <div class="row mb-4 g-3">
+                                                            <div class="col-md-6">
+                                                                <div class="bg-white p-3 rounded-3 shadow-sm h-100 border-start border-4 border-primary">
+                                                                    <small class="text-muted fw-bold d-block mb-1 text-uppercase">İşlemi Yapan Hesap</small>
+                                                                    <span class="fs-6 fw-bold"><i class="fa-solid fa-user-tie me-2 text-primary"></i>{{ log.kullanici.username|title }}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="bg-white p-3 rounded-3 shadow-sm h-100 border-start border-4 border-info">
+                                                                    <small class="text-muted fw-bold d-block mb-1 text-uppercase">Sunucu İşlem Zamanı</small>
+                                                                    <span class="fs-6 fw-bold"><i class="fa-solid fa-server me-2 text-info"></i>{{ log.tarih|date:"d F Y - H:i:s" }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Kara Kutu (Raw Data) Ekranı -->
+                                                        <div class="card border-0 shadow-sm">
+                                                            <div class="card-header bg-white border-bottom fw-bold text-secondary py-3">
+                                                                <i class="fa-solid fa-database me-2"></i>Kaydedilen İşlem Detayları (Raw Data)
+                                                            </div>
+                                                            <div class="card-body bg-dark text-light p-4" style="font-family: 'Courier New', Courier, monospace; font-size: 1rem; white-space: pre-wrap; border-radius: 0 0 10px 10px; line-height: 1.6;">{{ log.detay }}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer border-top-0 bg-light rounded-bottom-4 p-3">
+                                                        <button type="button" class="btn btn-secondary px-5 fw-bold rounded-pill" data-bs-dismiss="modal">Kapat</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- MODAL BİTİŞİ -->
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">Bu hastaya ait sistem logu bulunmamaktadır.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -133,7 +311,47 @@
                 </div>
             </div>
 
+        </div> <!-- /.tab-content KAPANIŞI -->
+    </div> <!-- /.col-lg-8 KAPANIŞI -->
+</div> <!-- /.row KAPANIŞI -->
+
+<!-- Yeni İlaç Modalı (Sadece Yönetici ve Doktor İçin) -->
+{% if request.user.profil.rol == 'yönetici' or request.user.profil.rol == 'doktor' %}
+<div class="modal fade" id="yeniIlacModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+            <div class="modal-header bg-primary bg-opacity-10">
+                <h5 class="modal-title fw-bold text-primary"><i class="fa-solid fa-pills me-2"></i>Reçeteye İlaç Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'hasta_ilac_ekle' hasta.id %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">İLAÇ ADI</label>
+                        <input type="text" class="form-control" name="ilac_adi" placeholder="Örn: Parol 500mg" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">GÜNLÜK DOZ (Adet)</label>
+                        <input type="number" class="form-control" name="doz" placeholder="Örn: 2" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary px-4">Kaydet</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+{% endif %}
+
+<!-- Hızlı Not Ekleme JS Scripti -->
+<script>
+    function hizliNotEkle(metin) {
+        const notAlani = document.getElementById('klinikNot');
+        notAlani.value += metin;
+        notAlani.focus();
+    }
+</script>
 {% endblock %}

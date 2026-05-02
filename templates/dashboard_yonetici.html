@@ -3,6 +3,7 @@
 {% block title %}Master Komuta Merkezi | GümüşBakım ERP{% endblock %}
 
 {% block content %}
+<!-- Sayfa Başlığı ve Senkronizasyon Durumu -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold text-dark mb-1">Operasyon Komuta Merkezi</h4>
@@ -16,6 +17,7 @@
     </div>
 </div>
 
+<!-- Üst İstatistik Kartları -->
 <div class="row g-3 mb-4">
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
@@ -71,6 +73,7 @@
     </div>
 </div>
 
+<!-- Atama Merkezi Banner -->
 <div class="card border-0 shadow-sm rounded-3 mb-4" style="border-left: 5px solid #0d6efd !important;">
     <div class="row g-0 align-items-center p-3 p-md-4">
         <div class="col-md-8 mb-3 mb-md-0">
@@ -86,17 +89,14 @@
 </div>
 
 <div class="row g-4 mb-4">
-    
+    <!-- SOL KOLON (Saha İşlemleri ve Grafikler) -->
     <div class="col-lg-8 d-flex flex-column gap-4">
-        
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
             <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-clipboard-check text-muted me-2"></i>Son Saha İşlemleri</h6>
-                
-                <a href="{% url 'atama_merkezi' %}" class="btn btn-sm btn-light border fw-bold text-secondary hover-bg-light" style="font-size: 0.75rem;">
+                <a href="{% url 'atama_merkezi' %}" class="btn btn-sm btn-light border fw-bold text-secondary" style="font-size: 0.75rem;">
                     Tümünü Gör <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.65rem;"></i>
                 </a>
-
             </div>
             <div class="table-responsive">
                 <table class="table table-borderless align-middle mb-0">
@@ -126,42 +126,28 @@
             </div>
         </div>
 
+        <!-- Operasyon Grafiği -->
         <div class="card border-0 shadow-sm rounded-3 p-4">
             <h6 class="mb-3 fw-bold text-dark"><i class="fa-solid fa-chart-simple text-muted me-2"></i>Haftalık Operasyon Hacmi</h6>
-            
             <div class="d-flex align-items-end gap-2 border-bottom pt-4 pb-0" style="height: 120px;">
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 40%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">12</span>
-                </div>
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 60%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">18</span>
-                </div>
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 30%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">9</span>
-                </div>
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 80%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">24</span>
-                </div>
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 50%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">15</span>
-                </div>
-                <div class="flex-grow-1 bg-primary rounded-top position-relative shadow-sm" style="height: 90%; cursor: pointer;">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-primary" style="font-size: 0.7rem;">27</span>
-                </div>
-                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25 border-bottom-0 position-relative" style="height: 20%; transition: all 0.3s; cursor: pointer;" onmouseover="this.classList.replace('bg-opacity-10', 'bg-opacity-25')" onmouseout="this.classList.replace('bg-opacity-25', 'bg-opacity-10')">
-                    <span class="position-absolute top-0 start-50 translate-middle-x mt-n4 small fw-bold text-muted" style="font-size: 0.7rem;">6</span>
-                </div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 40%;"></div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 60%;"></div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 30%;"></div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 80%;"></div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 50%;"></div>
+                <div class="flex-grow-1 bg-primary rounded-top shadow-sm" style="height: 95%;"></div>
+                <div class="flex-grow-1 bg-primary bg-opacity-10 rounded-top border border-primary border-opacity-25" style="height: 20%;"></div>
             </div>
-            
             <div class="d-flex justify-content-between mt-2 text-muted" style="font-size: 0.7rem;">
                 <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span class="text-primary fw-bold">Cmt</span><span>Paz</span>
             </div>
         </div>
-
     </div>
 
+    <!-- SAĞ KOLON (Personel, Mesajlar ve Riskler) -->
     <div class="col-lg-4 d-flex flex-column gap-4">
         
+        <!-- Saha Personel Durumu -->
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
             <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-walkie-talkie text-muted me-2"></i>Saha Personel Durumu</h6>
@@ -182,17 +168,48 @@
                     </div>
                     <span class="fw-bold">{{ bugunku_ziyaretler }}</span>
                 </div>
-                <div class="p-3 d-flex justify-content-between align-items-center bg-light">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-secondary rounded-circle me-2" style="width: 8px; height: 8px;"></div>
-                        <span class="fw-bold text-muted" style="font-size: 0.85rem;">İzinli / Çevrimdışı</span>
-                    </div>
-                    <span class="fw-bold text-muted">1</span>
-                </div>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-3 overflow-hidden flex-grow-1">
+        <!-- ✉️ YENİ: MERKEZİ İLETİŞİM (MESAJLAR) PANELİ -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-comments text-muted me-2"></i>Merkezi İletişim</h6>
+                <a href="{% url 'mesajlar' %}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none p-0" style="font-size: 0.75rem;">Tümüne Git</a>
+            </div>
+            <div class="p-0" style="max-height: 350px; overflow-y: auto;">
+                {% for m in son_mesajlar %}
+                <div class="p-3 border-bottom hover-bg-light transition-all" style="cursor: pointer;">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="d-flex align-items-center">
+                            <img src="https://ui-avatars.com/api/?name={{ m.gonderen.username }}&background=random&size=30" class="rounded-circle me-2" width="24">
+                            <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ m.gonderen.get_full_name|default:m.gonderen.username }}</span>
+                        </div>
+                        <small class="text-muted" style="font-size: 0.7rem;">{{ m.tarih|date:"H:i" }}</small>
+                    </div>
+                    <div class="ps-4">
+                        <p class="mb-0 {% if m.acil_mi %}text-danger fw-bold{% else %}text-muted{% endif %}" style="font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {% if m.acil_mi %}<i class="fa-solid fa-triangle-exclamation me-1"></i>{% endif %}
+                            {{ m.icerik }}
+                        </p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 text-muted small">
+                    <i class="fa-solid fa-comment-slash fs-3 opacity-25 mb-2"></i><br>
+                    Henüz mesaj bulunmuyor.
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-light border-0 p-2">
+                <a href="{% url 'mesajlar' %}" class="btn btn-primary btn-sm w-100 fw-bold rounded-2">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Yeni Mesaj Gönder
+                </a>
+            </div>
+        </div>
+
+        <!-- Alerji Riskleri -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
             <div class="card-header border-bottom p-3 d-flex justify-content-between align-items-center" style="background-color: #fef2f2;">
                 <h6 class="mb-0 fw-bold text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Alerji Riskleri</h6>
                 <span class="badge bg-danger rounded-pill">{{ hastalar|length }}</span>
@@ -209,79 +226,58 @@
                     </div>
                     {% endif %}
                 {% empty %}
-                    <div class="text-center py-5 text-muted small">
-                        <i class="fa-solid fa-shield-check fs-3 text-success opacity-50 mb-2"></i><br>
-                        Aktif risk tespit edilmedi.
-                    </div>
+                    <div class="text-center py-5 text-muted small">Aktif risk tespit edilmedi.</div>
                 {% endfor %}
             </div>
         </div>
-
     </div>
 </div>
 
+<!-- Sistem Kısayolları -->
 <h6 class="fw-bold text-muted mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Sistem Kısayolları</h6>
 <div class="row g-4 mb-5">
-    
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white" style="transition: all 0.3s ease;" onmouseover="this.classList.replace('shadow-sm','shadow'); this.style.transform='translateY(-4px)';" onmouseout="this.classList.replace('shadow','shadow-sm'); this.style.transform='translateY(0)';">
+        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white shadow-hover">
             <div class="card-body p-4 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle me-3" style="width: 55px; height: 55px;">
-                        <i class="fa-solid fa-hospital-user fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-1">Klinik Merkezi</h6>
-                        <small class="text-muted fw-medium" style="font-size: 0.8rem;">Hasta Dosyaları</small>
-                    </div>
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 55px; height: 55px;"><i class="fa-solid fa-hospital-user fs-4"></i></div>
+                    <div><h6 class="fw-bold text-dark mb-1">Klinik Merkezi</h6><small class="text-muted">Hasta Dosyaları</small></div>
                 </div>
-                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
-                </div>
+                <i class="fa-solid fa-chevron-right text-muted"></i>
             </div>
             <a href="{% url 'hasta_listesi' %}" class="stretched-link"></a>
         </div>
     </div>
-
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white" style="transition: all 0.3s ease;" onmouseover="this.classList.replace('shadow-sm','shadow'); this.style.transform='translateY(-4px)';" onmouseout="this.classList.replace('shadow','shadow-sm'); this.style.transform='translateY(0)';">
+        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white shadow-hover">
             <div class="card-body p-4 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle me-3" style="width: 55px; height: 55px;">
-                        <i class="fa-solid fa-users-viewfinder fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-1">İnsan Kaynakları</h6>
-                        <small class="text-muted fw-medium" style="font-size: 0.8rem;">Personel Sicili</small>
-                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 55px; height: 55px;"><i class="fa-solid fa-users-viewfinder fs-4"></i></div>
+                    <div><h6 class="fw-bold text-dark mb-1">İnsan Kaynakları</h6><small class="text-muted">Personel Sicili</small></div>
                 </div>
-                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
-                </div>
+                <i class="fa-solid fa-chevron-right text-muted"></i>
             </div>
             <a href="{% url 'personel_listesi' %}" class="stretched-link"></a>
         </div>
     </div>
-
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white" style="transition: all 0.3s ease;" onmouseover="this.classList.replace('shadow-sm','shadow'); this.style.transform='translateY(-4px)';" onmouseout="this.classList.replace('shadow','shadow-sm'); this.style.transform='translateY(0)';">
+        <div class="card border-0 shadow-sm rounded-4 h-100 position-relative bg-white shadow-hover">
             <div class="card-body p-4 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-circle me-3" style="width: 55px; height: 55px;">
-                        <i class="fa-solid fa-boxes-stacked fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-1">Merkez Depo</h6>
-                        <small class="text-muted fw-medium" style="font-size: 0.8rem;">Envanter Takibi</small>
-                    </div>
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 55px; height: 55px;"><i class="fa-solid fa-boxes-stacked fs-4"></i></div>
+                    <div><h6 class="fw-bold text-dark mb-1">Merkez Depo</h6><small class="text-muted">Envanter Takibi</small></div>
                 </div>
-                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.8rem;"></i>
-                </div>
+                <i class="fa-solid fa-chevron-right text-muted"></i>
             </div>
             <a href="{% url 'stok_listesi' %}" class="stretched-link"></a>
         </div>
     </div>
-
 </div>
+
+<style>
+    .shadow-hover { transition: all 0.3s ease; }
+    .shadow-hover:hover { transform: translateY(-4px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .hover-bg-light:hover { background-color: #f8f9fa; }
+</style>
 {% endblock %}

@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}Toplu E-Reçete Yönetimi | GümüşBakım{% endblock %}
+
+{% block content %}
+<!-- Sayfa Başlığı ve Geri Dönüş -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-3">
+    <div> 
+        <a href="javascript:history.back()" class="text-decoration-none text-muted fw-bold mb-2 d-inline-block">
+            <i class="fa-solid fa-arrow-left me-1"></i> Panele Dön
+        </a>
+        <h4 class="fw-bold text-dark mb-1"><i class="fa-solid fa-file-prescription text-primary me-2"></i>Toplu Kronik Reçete Yönetimi</h4>
+        <p class="text-secondary small mb-0 fw-medium">Sadece "İlaç Yazdırma" talebiyle gelen ve e-reçete bekleyen hastalar listelenmektedir.</p>
+    </div>
+    
+    <div class="mt-3 mt-md-0 d-print-none">
+        <button type="button" class="btn btn-primary fw-bold shadow-sm px-4 py-2" id="btnTopluImza">
+            <i class="fa-solid fa-signature me-2"></i> Seçilenleri İmzala ve SGK'ya Gönder (<span id="seciliSayi">0</span>)
+        </button>
+    </div>
+</div>
+
+<!-- Filtreleme ve Arama Çubuğu -->
+<div class="card border-0 shadow-sm rounded-3 mb-4 bg-white d-print-none">
+    <div class="card-body p-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-search"></i></span>
+                    <input type="text" id="receteArama" class="form-control bg-light border-start-0" placeholder="Hasta TC, Ad Soyad veya Tanı Kodu Ara...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm bg-light text-muted">
+                    <option value="">Tüm Risk Grupları</option>
+                    <option value="alerji">Alerjisi Olanlar</option>
+                    <option value="etkilesim">İlaç Etkileşim Riski</option>
+                    <option value="risksiz">Risk Bulunmayanlar</option>
+                </select>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 py-2 px-3">
+                    <i class="fa-solid fa-circle-check me-1"></i> MEDULA Bağlantısı Aktif
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toplu Reçete Tablosu (DİNAMİK VERİ) -->
+<div class="card border border-secondary border-opacity-25 shadow-sm rounded-3 overflow-hidden bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light text-secondary">
+                <tr style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <th class="ps-4 py-3 border-bottom d-print-none" style="width: 50px;">
+                        <input class="form-check-input border-secondary shadow-none" type="checkbox" id="checkAll">
+                    </th>
+                    <th class="py-3 border-bottom">Hasta Bilgisi</th>
+                    <th class="py-3 border-bottom">Tanı & Risk Durumu</th>
+                    <th class="py-3 border-bottom" style="width: 35%;">Yenilenecek İlaç Listesi (Düzenlenebilir)</th>
+                    <th class="py-3 border-bottom text-center">İşlem Durumu</th>
+                </tr>
+            </thead>
+            <tbody id="receteTablosu" style="font-size: 0.85rem;">
+                
+                {% for hasta in hastalar %}
+                <tr class="arama-satiri">
+                    <td class="ps-4 d-print-none">
+                        <input class="form-check-input row-check border-secondary shadow-none" type="checkbox">
+                    </td>
+                    <td>
+                        <div class="fw-bolder text-dark" style="font-size: 0.95rem;">{{ hasta.ad|title }} {{ hasta.soyad|title }}</div>
+                        <div class="text-muted small font-monospace mt-1">TC: {{ hasta.tc_kimlik_no }} | Yaş: {{ hasta.yas|default:"-" }}</div>
+                    </td>
+                    <td>
+                        {% if hasta.kronik_hastaliklar %}
+                            <span class="badge bg-secondary bg-opacity-10 text-dark border border-secondary border-opacity-25 mb-2 px-2 py-1">{{ hasta.kronik_hastaliklar|truncatechars:30 }}</span><br>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-dark border border-secondary border-opacity-25 mb-2 px-2 py-1">Rutin Kontrol</span><br>
+                        {% endif %}
+                        
+                        {% if hasta.alerjiler %}
+                            <span class="text-danger small fw-bold bg-danger bg-opacity-10 px-2 py-1 rounded-2 border border-danger border-opacity-25">
+                                <i class="fa-solid fa-biohazard me-1"></i>{{ hasta.alerjiler }}
+                            </span>
+                        {% else %}
+                            <span class="text-success small fw-bold bg-success bg-opacity-10 px-2 py-1 rounded-2 border border-success border-opacity-25">
+                                <i class="fa-solid fa-shield-check me-1"></i>Risk Tespit Edilmedi
+                            </span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Sistemden İlaçları Çeken Alan -->
+                    <td class="ilac-sutunu">
+                        <div class="ilac-listesi d-flex flex-column gap-2">
+                            {% for ilac in hasta.hastailac_set.all %}
+                            <div class="ilac-item d-flex justify-content-between align-items-center bg-light p-2 rounded-2 border">
+                                <div>
+                                    <span class="fw-bold text-primary d-block">{{ ilac.ilac_adi|default:ilac.ad }}</span>
+                                    <span class="badge bg-white text-dark border mt-1">{{ ilac.doz|default:"1x1" }}</span>
+                                </div>
+                                <button type="button" class="btn btn-sm text-danger border-0 btn-ilac-sil d-print-none" title="İlacı Listeden Çıkar">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="text-muted small fst-italic p-2 border rounded-2 bg-light text-center">
+                                Kayıtlı rutin ilaç bulunamadı.
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2 w-100 fw-bold btn-ilac-ekle d-print-none" style="border-style: dashed;">
+                            <i class="fa-solid fa-plus me-1"></i> Yeni İlaç Ekle
+                        </button>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm islem-durumu-rozet">
+                            <i class="fa-solid fa-hourglass-half me-1"></i> E-İmza Bekliyor
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="bosKayitSatiri">
+                    <td colspan="5" class="text-center py-5">
+                        <i class="fa-solid fa-folder-open fs-2 text-muted opacity-25 mb-3"></i>
+                        <h6 class="fw-bold text-muted mb-0">Reçete bekleyen hasta kaydı bulunmuyor.</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Başarılı İşlem ve Yazdır Modalı -->
+<div class="modal fade" id="receteSonucModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-success bg-opacity-10 border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold text-success"><i class="fa-solid fa-circle-check me-2"></i>İşlem Başarılı</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <i class="fa-solid fa-file-prescription text-success mb-3" style="font-size: 3.5rem;"></i>
+        <h4 class="fw-bold text-dark mb-2">E-Reçete Üretildi</h4>
+        <p class="text-muted mb-4"><span id="modalHastaSayisi" class="fw-bold text-dark"></span> adet hastanın reçetesi SGK Medula sistemine başarıyla iletildi.</p>
+        
+        <div class="bg-light border border-secondary border-opacity-25 rounded-3 p-3 d-inline-block shadow-sm">
+            <span class="text-muted small d-block mb-1 text-uppercase fw-bold" style="letter-spacing: 1px;">Toplu İşlem Takip Numarası</span>
+            <span id="modalReceteNo" class="fs-4 fw-bolder text-primary font-monospace"></span>
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 pt-0 justify-content-center pb-4">
+        <button type="button" class="btn btn-light fw-bold shadow-sm px-4" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-success fw-bold shadow-sm px-4" onclick="window.print()">
+            <i class="fa-solid fa-print me-2"></i> Listeyi Yazdır
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    @media print {
+        .d-print-none { display: none !important; }
+        body { background-color: white !important; }
+        .modal, .modal-backdrop { display: none !important; }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const aramaKutusu = document.getElementById("receteArama");
+        const tabloGövdesi = document.getElementById("receteTablosu");
+        const checkAll = document.getElementById("checkAll");
+        const rowChecks = document.querySelectorAll(".row-check");
+        const seciliSayiText = document.getElementById("seciliSayi");
+        const btnTopluImza = document.getElementById("btnTopluImza");
+
+        // Sayacı güncelle
+        function seciliSayiyiGuncelle() {
+            let seciliAdet = document.querySelectorAll('.row-check:checked').length;
+            seciliSayiText.textContent = seciliAdet;
+            if(seciliAdet === 0) { btnTopluImza.classList.add('disabled'); } 
+            else { btnTopluImza.classList.remove('disabled'); }
+        }
+
+        // Tümünü Seç / Kaldır
+        if(checkAll) {
+            checkAll.addEventListener("change", function() {
+                rowChecks.forEach(cb => {
+                    if(cb.closest('tr').style.display !== 'none' && !cb.disabled) {
+                        cb.checked = checkAll.checked;
+                    }
+                });
+                seciliSayiyiGuncelle();
+            });
+        }
+
+        rowChecks.forEach(cb => { cb.addEventListener("change", seciliSayiyiGuncelle); });
+
+        // Canlı Arama
+        if(aramaKutusu && tabloGövdesi) {
+            aramaKutusu.addEventListener("input", function() {
+                let filtre = aramaKutusu.value.toLowerCase().trim();
+                let satirlar = tabloGövdesi.querySelectorAll(".arama-satiri");
+                satirlar.forEach(function(satir) {
+                    let satirMetni = satir.textContent || satir.innerText;
+                    if (satirMetni.toLowerCase().includes(filtre)) {
+                        satir.style.display = ""; 
+                    } else {
+                        satir.style.display = "none";
+                        let checkbox = satir.querySelector('.row-check');
+                        if(checkbox && checkbox.checked && !checkbox.disabled) { checkbox.checked = false; }
+                    }
+                });
+                seciliSayiyiGuncelle();
+            });
+        }
+
+        // --- İLAÇ DÜZENLEME İŞLEMLERİ ---
+        document.addEventListener('click', function(e) {
+            // Silme
+            if (e.target.closest('.btn-ilac-sil')) {
+                const btn = e.target.closest('.btn-ilac-sil');
+                const item = btn.closest('.ilac-item');
+                const liste = item.closest('.ilac-listesi');
+                if(liste.children.length === 1 && !liste.querySelector('.text-muted')) {
+                    alert("Uyarı: Hastanın reçetesinde en az 1 ilaç kalmalıdır!");
+                    return;
+                }
+                item.remove();
+            }
+
+            // Form Açma
+            if (e.target.closest('.btn-ilac-ekle')) {
+                const btn = e.target.closest('.btn-ilac-ekle');
+                const formHtml = `
+                    <div class="ilac-ekleme-formu d-flex gap-1 mt-2 p-2 border border-primary border-opacity-25 rounded-2 bg-primary bg-opacity-10 shadow-sm">
+                        <input type="text" class="form-control form-control-sm yeni-ilac-adi border-primary" placeholder="İlaç Adı (Örn: Parol)">
+                        <input type="text" class="form-control form-control-sm yeni-ilac-dozu border-primary" placeholder="Doz (1x1)" style="width: 85px;">
+                        <button type="button" class="btn btn-sm btn-success btn-ilac-kaydet"><i class="fa-solid fa-check"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger btn-ilac-iptal"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+                btn.insertAdjacentHTML('beforebegin', formHtml);
+                btn.style.display = 'none';
+                
+                // Eğer "kayıtlı ilaç yok" yazısı varsa gizle
+                const bosUyari = btn.parentElement.querySelector('.text-muted.fst-italic');
+                if (bosUyari) bosUyari.style.display = 'none';
+            }
+
+            // Kaydetme
+            if (e.target.closest('.btn-ilac-kaydet')) {
+                const btn = e.target.closest('.btn-ilac-kaydet');
+                const form = btn.closest('.ilac-ekleme-formu');
+                const td = form.closest('.ilac-sutunu');
+                const adi = form.querySelector('.yeni-ilac-adi').value.trim();
+                const dozu = form.querySelector('.yeni-ilac-dozu').value.trim();
+
+                if (adi !== "" && dozu !== "") {
+                    const ilacListesi = td.querySelector('.ilac-listesi');
+                    const yeniIlacHtml = `
+                        <div class="ilac-item d-flex justify-content-between align-items-center bg-light p-2 rounded-2 border mt-2 border-success border-opacity-50">
+                            <div>
+                                <span class="fw-bold text-primary d-block">${adi}</span>
+                                <span class="badge bg-white text-dark border mt-1">${dozu}</span>
+                            </div>
+                            <button type="button" class="btn btn-sm text-danger border-0 btn-ilac-sil d-print-none" title="İlacı Listeden Çıkar">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                    ilacListesi.insertAdjacentHTML('beforeend', yeniIlacHtml);
+                    form.remove();
+                    td.querySelector('.btn-ilac-ekle').style.display = 'block';
+                } else {
+                    alert("Lütfen ilaç adını ve dozunu boş bırakmayın.");
+                }
+            }
+
+            // İptal Etme
+            if (e.target.closest('.btn-ilac-iptal')) {
+                const btn = e.target.closest('.btn-ilac-iptal');
+                const form = btn.closest('.ilac-ekleme-formu');
+                const td = form.closest('.ilac-sutunu');
+                form.remove();
+                td.querySelector('.btn-ilac-ekle').style.display = 'block';
+                
+                // Eğer listede hiç ilaç kalmadıysa "kayıtlı ilaç yok" yazısını tekrar göster
+                const liste = td.querySelector('.ilac-listesi');
+                const bosUyari = liste.querySelector('.text-muted.fst-italic');
+                if (liste.querySelectorAll('.ilac-item').length === 0 && bosUyari) {
+                    bosUyari.style.display = 'block';
+                }
+            }
+        });
+
+        // --- GÖNDERİM VE YAZDIRMA İŞLEMİ ---
+        btnTopluImza.addEventListener("click", function() {
+            let seciliSatirlar = document.querySelectorAll('.row-check:checked');
+            let hastaSayisi = seciliSatirlar.length;
+            if(hastaSayisi === 0) return;
+
+            // Ortak Toplu İşlem Numarası (Sadece modalda görünecek)
+            let topluIslemNo = "TRX-" + Math.floor(10000 + Math.random() * 90000);
+            
+            // HER BİR HASTA İÇİN AYRI RPT NUMARASI ÜRETECEĞİZ
+            seciliSatirlar.forEach(cb => {
+                let satir = cb.closest('tr');
+                cb.checked = false;
+                cb.disabled = true; 
+                satir.classList.add('table-success'); 
+                
+                // FARKLI E-Reçete numarası üret
+                let kisiselReceteNo = "RPT" + Math.floor(10000000 + Math.random() * 90000000);
+                
+                satir.querySelectorAll('.btn-ilac-sil, .btn-ilac-ekle, .ilac-ekleme-formu').forEach(el => el.remove());
+                
+                let durumHucresi = satir.querySelector('.islem-durumu-rozet').parentElement;
+                durumHucresi.innerHTML = '<span class="badge bg-success px-3 py-2 rounded-pill shadow-sm"><i class="fa-solid fa-check me-1"></i> Gönderildi</span><br><small class="text-muted fw-bold mt-1 d-block">' + kisiselReceteNo + '</small>';
+            });
+
+            if(checkAll) checkAll.checked = false;
+            seciliSayiyiGuncelle();
+
+            document.getElementById('modalHastaSayisi').innerText = hastaSayisi;
+            document.getElementById('modalReceteNo').innerText = topluIslemNo;
+            var sonucModal = new bootstrap.Modal(document.getElementById('receteSonucModal'));
+            sonucModal.show();
+        });
+        
+        // Sayfa yüklendiğinde buton sayısını sıfırla
+        seciliSayiyiGuncelle();
+    });
+</script>
+{% endblock %}

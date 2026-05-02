@@ -1,5 +1,5 @@
 from django.db import models
-from hastalar.models import Hasta, HastaIlaci
+from hastalar.models import Hasta, HastaIlac
 from django.contrib.auth.models import User
 
 class Ziyaret(models.Model):
@@ -10,7 +10,7 @@ class Ziyaret(models.Model):
         ('enjeksiyon', 'Enjeksiyon / Serum'),
     )
 
-    Durum_secenekleri = [
+    DURUM_SECENEKLERI = [
         ('planlandi', 'Planlandı'),
         ('tamamlandi', 'Tamamlandı'),
         ('iptal', 'İptal Edildi'),
@@ -20,17 +20,18 @@ class Ziyaret(models.Model):
     personel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Personel")
     ziyaret_tarihi = models.DateTimeField(verbose_name="Ziyaret Tarihi")
     
-    # FORMLA EŞLEŞMESİ İÇİN EKLENEN KRİTİK ALANLAR (Hatanın Sebebi Burasıydı)
+    # İşlem tipi ve notlar (Formlarla tam uyum için)
     islem_tipi = models.CharField(max_length=50, choices=ISLEM_CHOICES, default='muayene', verbose_name="İşlem Tipi")
     notlar = models.TextField(blank=True, null=True, verbose_name="Görev Notları")
     
-    # Eski alanını bozmadım, belki tamamlama aşamasında lazım olur
+    # Detaylı kayıt için yapılan işlemler alanı
     yapilan_islemler = models.TextField(verbose_name="Yapılan İşlemler", blank=True, null=True) 
     
-    durum = models.CharField(max_length=20, choices=Durum_secenekleri, default='planlandi')
+    durum = models.CharField(max_length=20, choices=DURUM_SECENEKLERI, default='planlandi', verbose_name="Ziyaret Durumu")
 
     def __str__(self):
-        return f"{self.hasta.ad_soyad} - {self.get_durum_display()}"
+        # Hasta modelinde ad_soyad alanı olmadığı için manuel birleştiriyoruz
+        return f"{self.hasta.ad} {self.hasta.soyad} - {self.get_durum_display()}"
     
     class Meta:
         verbose_name = "Ziyaret"
@@ -39,20 +40,24 @@ class Ziyaret(models.Model):
 # --- MÜKEMMEL ÇALIŞAN KÖR SAYIM ALGORİTMASI ---
 class ZiyaretIlacKontrol(models.Model):
     ziyaret = models.ForeignKey(Ziyaret, on_delete=models.CASCADE, related_name='ilac_kontrolleri')
-    ilac = models.ForeignKey(HastaIlaci, on_delete=models.CASCADE, verbose_name="Kontrol Edilen İlaç")
+    ilac = models.ForeignKey(HastaIlac, on_delete=models.CASCADE, verbose_name="Kontrol Edilen İlaç")
     hemsirenin_saydigi_adet = models.IntegerField(verbose_name="Kutuda Kalan Sayı")
     
     def __str__(self):
-        return f"{self.ziyaret.hasta.ad_soyad} - {self.ilac.ilac_adi} Kontrolü"
+        # Burada da isim birleştirmesi hatayı önler
+        return f"{self.ziyaret.hasta.ad} {self.ziyaret.hasta.soyad} - {self.ilac.ilac_adi} Kontrolü"
 
     class Meta:
         verbose_name = "İlaç Kontrolü"
         verbose_name_plural = "İlaç Kontrolleri"
 
-    # ÇAPRAZ DOĞRULAMA ALGORİTMASI BURASI:
     @property
     def durum_analizi(self):
-        # Hemşirenin saydığı sayıdan, sistemin beklediği sayıyı çıkar
+        """
+        ÇAPRAZ DOĞRULAMA ALGORİTMASI:
+        Hemşirenin saydığı sayıdan, sistemin (HastaIlac property) beklediği sayıyı çıkarır.
+        """
+        # HastaIlac modelindeki 'beklenen_kalan' property'sini kullanır
         fark = self.hemsirenin_saydigi_adet - self.ilac.beklenen_kalan
         
         if fark == 0:

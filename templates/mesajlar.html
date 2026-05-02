@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Mesajlar | GümüşBakım{% endblock %}
+
+{% block content %}
+<div class="row g-0 bg-white shadow-sm rounded-4 overflow-hidden" style="height: 80vh; border: 1px solid #e0e0e0;">
+    
+    <!-- SOL PANEL: Kişi Listesi -->
+    <div class="col-md-4 border-end d-flex flex-column bg-white">
+        <div class="p-3 border-bottom bg-light">
+            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-comments me-2 text-primary"></i>Sohbetler</h5>
+        </div>
+        <div class="list-group list-group-flush overflow-auto flex-grow-1">
+            {% for personel in personeller %}
+            <a href="{% url 'ozel_mesajlar' personel.id %}" class="list-group-item list-group-item-action p-3 border-0 border-bottom d-flex align-items-center justify-content-between {% if secilen_alici.id == personel.id %}bg-primary bg-opacity-10{% endif %}">
+                <div class="d-flex align-items-center gap-3 overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name={{ personel.username }}&background=random" class="rounded-circle" width="45">
+                    <div class="overflow-hidden">
+                        <div class="fw-bold text-dark text-truncate">{{ personel.get_full_name|default:personel.username }}</div>
+                        <div class="small text-primary fw-medium" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-user-tag me-1"></i>{{ personel.profil.get_rol_display|upper }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHATSAPP TARZI ROZET: Sadece yeni mesaj varsa görünür -->
+                {% if personel.okunmamis_mesaj_sayisi > 0 %}
+                <span class="badge rounded-pill bg-success shadow-sm animate__animated animate__bounceIn">
+                    {{ personel.okunmamis_mesaj_sayisi }}
+                </span>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- SAĞ PANEL: Sohbet Alanı -->
+    <div class="col-md-8 d-flex flex-column bg-white" style="height: 100%;">
+        {% if secilen_alici %}
+        <!-- Sohbet Başlığı ve KAPAT Butonu -->
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+            <div class="d-flex align-items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name={{ secilen_alici.username }}&background=random" class="rounded-circle" width="40">
+                <div>
+                    <h6 class="fw-bold mb-0">{{ secilen_alici.get_full_name|default:secilen_alici.username }}</h6>
+                    <small class="text-success small"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Çevrimiçi</small>
+                </div>
+            </div>
+            <a href="{% url 'mesajlar' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm">
+                <i class="fa-solid fa-xmark me-1"></i> Sohbeti Kapat
+            </a>
+        </div>
+
+        <!-- MESAJ AKIŞI -->
+        <div id="chat-window" class="flex-grow-1 p-4 overflow-auto d-flex flex-column gap-3" style="background-color: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay;">
+            {% for m in mesajlar %}
+            <div class="d-flex {% if m.gonderen == request.user %}justify-content-end{% endif %}">
+                <div class="p-2 px-3 rounded-3 shadow-sm position-relative chat-bubble {% if m.gonderen == request.user %}sent-message{% else %}received-message{% endif %}" 
+                     style="max-width: 75%;">
+                    
+                    {% if m.gonderen == request.user %}
+                    <div class="dropdown position-absolute top-0 end-0 mt-1 me-1 opacity-50 bubble-menu">
+                        <button class="btn btn-sm p-0 border-0" data-bs-toggle="dropdown"><i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
+                        <ul class="dropdown-menu shadow-sm border-0 small">
+                            <li><a class="dropdown-item" href="#" onclick="editMessage('{{ m.id }}', '{{ m.icerik }}')"><i class="fa-solid fa-pen me-2"></i>Düzenle</a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'mesaj_sil' m.id %}"><i class="fa-solid fa-trash me-2"></i>Sil</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if m.acil_mi %}
+                        <small class="text-danger fw-bold d-block mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i>ACİL</small>
+                    {% endif %}
+
+                    <div id="text-{{ m.id }}" class="message-content">{{ m.icerik }}</div>
+                    <small class="text-muted d-block text-end mt-1" style="font-size: 0.65rem;">{{ m.tarih|date:"H:i" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- SABİT ALT PANEL: Mesaj Yazma Alanı -->
+        <div class="p-3 border-top bg-light">
+            <form method="POST" id="msg-form">
+                {% csrf_token %}
+                <div id="edit-mode-info" class="d-none bg-warning bg-opacity-10 p-2 mb-2 rounded border border-warning small d-flex justify-content-between">
+                    <span><i class="fa-solid fa-pen me-2"></i>Mesajı Düzenliyorsunuz</span>
+                    <button type="button" class="btn-close small" onclick="cancelEdit()"></button>
+                </div>
+                <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                    <div class="input-group-text bg-white border-0 ps-3">
+                        <input class="form-check-input mt-0" type="checkbox" name="acil_mi" id="acilInput">
+                        <label class="ms-2 small fw-bold text-danger mb-0" for="acilInput" style="cursor: pointer;">ACİL</label>
+                    </div>
+                    <input type="text" name="icerik" id="msg-input" class="form-control border-0 py-2 shadow-none" placeholder="Bir mesaj yazın..." required autocomplete="off">
+                    <button class="btn btn-primary px-4" type="submit" id="submit-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <!-- Sohbet Seçilmediğinde Görünen Ekran -->
+        <div class="d-flex flex-column justify-content-center align-items-center h-100 text-muted bg-light bg-opacity-50">
+            <div class="rounded-circle bg-white shadow-sm p-4 mb-3">
+                <i class="fa-solid fa-comments fs-1 text-primary opacity-50"></i>
+            </div>
+            <h5 class="fw-bold text-dark">GümüşBakım İletişim Merkezi</h5>
+            <p class="small text-center px-5">Sohbet etmek için soldan bir personel seçin.<br>Acil durumlar için "ACİL" kutucuğunu kullanın.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const chatWindow = document.getElementById("chat-window");
+    if(chatWindow) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function editMessage(id, oldText) {
+        const form = document.getElementById('msg-form');
+        const input = document.getElementById('msg-input');
+        const info = document.getElementById('edit-mode-info');
+        
+        form.action = "/mesaj-duzenle/" + id + "/";
+        input.value = oldText;
+        input.focus();
+        info.classList.remove('d-none');
+        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check"></i>';
+    }
+
+    function cancelEdit() {
+        window.location.reload();
+    }
+</script>
+
+<style>
+    .chat-bubble .bubble-menu { display: none; }
+    .chat-bubble:hover .bubble-menu { display: block; }
+    .chat-bubble { border-radius: 12px !important; }
+    #chat-window::-webkit-scrollbar { width: 5px; }
+    #chat-window::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    .message-content { word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; }
+    .list-group-item { transition: all 0.2s ease; }
+    .list-group-item:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}
